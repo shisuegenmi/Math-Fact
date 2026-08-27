@@ -1083,7 +1083,12 @@
             </div>
             <div class="flex items-center space-x-1.5">
               <input type="number" id="retry-input-${idx}" placeholder="?" 
+                oninput="autoCheckRetry(${idx}, ${item.correctAnswer})"
                 class="w-14 bg-violet-950 border border-violet-700/80 text-center font-bold text-white py-1 rounded-xl focus:border-purple-400 focus:outline-none text-xs">
+              <button onclick="revealAnswer(${idx}, ${item.correctAnswer})" 
+                class="bg-violet-800 hover:bg-violet-700 text-purple-200 font-bold px-2 py-1 rounded-xl text-xs cursor-pointer" title="Auto-fill Answer">
+                💡
+              </button>
               <button onclick="retryQuestion(${idx}, ${item.correctAnswer})" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1 rounded-xl text-xs cursor-pointer">
                 Check
               </button>
@@ -1100,6 +1105,30 @@
         startChallenge();
       } else {
         openLockModal();
+      }
+    }
+
+    /* Automatically validates answer in real-time as the student types */
+    function autoCheckRetry(idx, correctAnswer) {
+      const input = document.getElementById(`retry-input-${idx}`);
+      if (!input || input.value === '') return;
+      
+      const userVal = parseInt(input.value);
+      const targetLen = correctAnswer.toString().length;
+
+      if (input.value.length >= targetLen) {
+        if (userVal === correctAnswer) {
+          retryQuestion(idx, correctAnswer);
+        }
+      }
+    }
+
+    /* Automatically reveals and submits the correct answer upon clicking the hint icon */
+    function revealAnswer(idx, correctAnswer) {
+      const input = document.getElementById(`retry-input-${idx}`);
+      if (input) {
+        input.value = correctAnswer;
+        retryQuestion(idx, correctAnswer);
       }
     }
 
