@@ -410,6 +410,9 @@
 
   <!-- MAIN SCRIPT ENGINE -->
   <script>
+    /* Google Sheets Webhook Configuration */
+    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwTQ55_rcRTWS-mDIETTj8l4XrvtOwxuK6-r9kHBIAWy2XtEPKhOOFEjGMomCS_-ppc/exec';
+
     /* Full Roster of Students */
     const DEFAULT_ROSTER = [
       'Aliya', 'Floyd', 'Alex', 'Dulce', 'Riley', 'Jasmine', 'Ileana', 'Gracie', 
@@ -503,12 +506,67 @@
     /* Application Initialization */
     window.addEventListener('DOMContentLoaded', () => {
       loadProfiles();
+      loadProfilesFromSheet();
       renderStudentSelector();
       renderFactGrid();
       setupAdminShortcut();
       setupInputListeners();
       updateLockStatusUI();
+
+      window.addEventListener('resize', () => {
+        if (STATE.arcade.canvas && !document.getElementById('screen-arcade').classList.contains('hidden')) {
+          const rect = STATE.arcade.canvas.parentElement.getBoundingClientRect();
+          STATE.arcade.canvas.width = rect.width;
+          STATE.arcade.canvas.height = rect.height - 60;
+        }
+      });
     });
+
+    /* Google Sheets 2-Way Sync Engine */
+    function loadProfilesFromSheet() {
+      if (!GOOGLE_SHEETS_URL) return;
+
+      fetch(GOOGLE_SHEETS_URL)
+        .then(res => res.json())
+        .then(rows => {
+          if (!rows || rows.length <= 1) return;
+
+          DEFAULT_ROSTER.forEach(name => {
+            if (!STATE.students[name]) {
+              STATE.students[name] = createNewStudentObject();
+            }
+          });
+
+          for (let i = 1; i < rows.length; i++) {
+            const [student, op, family, total, correct] = rows[i];
+            if (STATE.students[student]) {
+              const stats = op === 'mult' ? STATE.students[student].multStats : STATE.students[student].divStats;
+              const fIdx = parseInt(family);
+              if (stats && stats[fIdx]) {
+                stats[fIdx].total += parseInt(total);
+                stats[fIdx].correct += parseInt(correct);
+              }
+            }
+          }
+          renderStudentSelector();
+          updateLockStatusUI();
+        })
+        .catch(err => console.error("Error loading data from sheet:", err));
+    }
+
+    function syncSessionToSheet(studentName, recordsArray) {
+      if (!GOOGLE_SHEETS_URL) return;
+
+      fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student: studentName,
+          records: recordsArray
+        })
+      }).catch(err => console.error("Sheet sync error:", err));
+    }
 
     function loadProfiles() {
       const saved = localStorage.getItem('mfm_students_v3');
@@ -1028,6 +1086,16 @@
         : 100;
 
       const student = STATE.students[STATE.activeStudent];
+
+      // Sync active session records to Google Sheet in background
+      const sessionRecords = [];
+      STATE.selectedFacts.forEach(fact => {
+        const multStat = student.multStats[fact];
+        const divStat = student.divStats[fact];
+        if (multStat.total > 0) sessionRecords.push({ op: 'mult', family: fact, total: multStat.total, correct: multStat.correct });
+        if (divStat.total > 0) sessionRecords.push({ op: 'div', family: fact, total: divStat.total, correct: divStat.correct });
+      });
+      syncSessionToSheet(STATE.activeStudent, sessionRecords);
 
       // Evaluate Qualification Rules for Space Blaster in Classic Mode
       if (STATE.gameMode === 'classic') {
