@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Fact</title>
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9' },
+            violetbg: { 900: '#2e1065', 950: '#1e1b4b' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(30, 27, 75, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.5);
+      border-radius: 9999px;
+    }
+
+    /* Ambient Soft Violet Glow Animation */
+    @keyframes ambientGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.08); }
+    }
+    .animate-glow-slow {
+      animation: ambientGlow 8s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-violet-950 via-purple-950 to-indigo-950 text-slate-100 font-sans h-full flex flex-col justify-between overflow-hidden select-none relative">
+
+  <!-- Ambient Soft Violet Atmospheric Glow Elements -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl pointer-events-none animate-glow-slow"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/25 rounded-full blur-3xl pointer-events-none animate-glow-slow" style="animation-delay: 4s;"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- TOP HEADER -->
+  <header class="h-14 px-4 sm:px-8 border-b border-violet-800/40 bg-violet-950/40 backdrop-blur-xl flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-purple-500 to-indigo-400 flex items-center justify-center font-black text-xl shadow-lg shadow-purple-500/30">
+        ∑
+      </div>
+      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-violet-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+        Math Fact
+      </span>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <!-- Active Profile Selector Button -->
+      <button id="student-select-btn" onclick="openStudentModal()" class="flex items-center space-x-2 bg-violet-900/50 hover:bg-violet-800/60 border border-violet-700/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-violet-200 transition cursor-pointer backdrop-blur-md">
+        <span class="text-violet-300">👤</span>
+        <span class="text-violet-300/80">Student:</span>
+        <span id="active-student-label" class="text-purple-200 font-bold">Aliya</span>
+        <span class="text-violet-400 text-[10px]">▼</span>
+      </button>
+
+      <!-- Growth Report Window Button -->
+      <button id="open-growth-btn" onclick="openGrowthModal()" class="flex items-center space-x-2 bg-purple-600/30 hover:bg-purple-600/40 border border-purple-400/40 text-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer backdrop-blur-md shadow-sm">
+        <svg class="w-4 h-4 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        <span>Growth Report</span>
+      </button>
+
+      <!-- Audio Mute/Unmute Toggle -->
+      <button id="sound-toggle-btn" onclick="toggleAudio()" class="p-2 bg-violet-900/50 hover:bg-violet-800/60 border border-violet-700/50 rounded-xl text-violet-200 transition cursor-pointer backdrop-blur-md" title="Toggle Sound SFX">
+        <span id="sound-icon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 relative flex items-center justify-center p-3 sm:p-4 overflow-hidden z-10">
+
+    <!-- 1. SETUP SCREEN -->
+    <section id="screen-setup" class="w-full max-w-xl mx-auto flex flex-col justify-center h-full max-h-[92vh]">
+      <div class="bg-violet-950/70 backdrop-blur-2xl rounded-[2.5rem] p-5 sm:p-6 border border-violet-800/50 shadow-2xl shadow-purple-950/80 space-y-4 flex flex-col justify-between overflow-hidden">
+        
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black text-center bg-gradient-to-r from-white via-violet-100 to-purple-200 bg-clip-text text-transparent tracking-tight">Fact Challenge</h1>
+          <p class="text-violet-300/80 text-xs sm:text-sm text-center mt-1 font-medium">Select your operations and facts to begin</p>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Challenge Mode</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="mode-classic-btn" onclick="selectGameMode('classic')" class="py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white shadow-lg shadow-purple-600/20 cursor-pointer">
+              <span>⚡ Classic 60s</span>
+            </button>
+            <button id="mode-arcade-btn" onclick="selectGameMode('arcade')" class="relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer">
+              <span id="arcade-mode-label">🚀 Space Blaster</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Operation Selection -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Operation</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="selectOperation('mult')" id="op-mult" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30 cursor-pointer">
+              Multiplication (×)
+            </button>
+            <button onclick="selectOperation('div')" id="op-div" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer">
+              Division (÷)
+            </button>
+            <button onclick="selectOperation('mix')" id="op-mix" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer">
+              Mixed (× & ÷)
+            </button>
+          </div>
+        </div>
+
+        <!-- Fact Family Chooser -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Target Fact Tables</label>
+            <button onclick="toggleAllFacts()" class="text-xs text-purple-300 font-bold hover:underline cursor-pointer">Select All</button>
+          </div>
+          <div id="facts-grid" class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Start Button -->
+        <button onclick="startChallenge()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-purple-600/35 active:scale-[0.98] transition cursor-pointer">
+          LAUNCH CHALLENGE
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. CLASSIC QUIZ SCREEN -->
+    <section id="screen-quiz" class="hidden w-full max-w-lg mx-auto flex flex-col justify-center h-full max-h-[92vh]">
+      <div class="bg-violet-950/80 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-violet-800/50 shadow-2xl space-y-5 relative overflow-hidden">
+        
+        <!-- Header Timers & Quit -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-2xl">⏱️</span>
+            <span id="quiz-total-timer" class="text-2xl font-black text-white">60s</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span id="quiz-score-badge" class="bg-purple-600/30 border border-purple-400/40 text-purple-200 font-black text-sm px-3 py-1 rounded-full">
+              Score: 0
+            </span>
+            <button onclick="quitChallenge()" class="bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer">
+              Quit
+            </button>
+          </div>
+        </div>
+
+        <!-- 5-Second Question Visual Bar Timer -->
+        <div class="w-full bg-violet-900/60 h-2.5 rounded-full overflow-hidden">
+          <div id="question-bar-timer" class="bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-full transition-all linear duration-100"></div>
+        </div>
+
+        <!-- Question Display Card -->
+        <div class="bg-violet-950/90 border border-violet-800/60 rounded-3xl p-8 flex flex-col items-center justify-center space-y-4 shadow-inner relative">
+          <div id="quiz-question-text" class="text-5xl sm:text-6xl font-black tracking-tight text-white">
+            2 × 3 = ?
+          </div>
+
+          <!-- Answer Box -->
+          <input type="number" id="quiz-answer-input" placeholder="?" autocomplete="off"
+            class="w-36 text-center text-4xl font-black bg-violet-900/60 border-2 border-purple-400/70 focus:border-purple-300 rounded-2xl py-2 text-purple-100 focus:outline-none shadow-lg">
+          
+          <!-- Instant Feedback Banner -->
+          <div id="quiz-feedback-banner" class="h-6 text-sm font-extrabold transition-all text-center"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SPACE FACT BLASTER ARCADE SCREEN -->
+    <section id="screen-arcade" class="hidden w-full max-w-3xl h-full max-h-[92vh] flex flex-col relative rounded-[2.5rem] overflow-hidden border border-violet-800/60 bg-violet-950/90 backdrop-blur-xl shadow-2xl">
+      <!-- Game Hud Overlay -->
+      <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
+        <div class="bg-violet-900/80 backdrop-blur-md border border-violet-700/60 rounded-2xl px-4 py-2 flex items-center space-x-4 shadow-lg">
+          <div><span class="text-xs text-violet-300 block">TIME</span><span id="arcade-timer" class="text-lg font-black text-white">60s</span></div>
+          <div class="w-px h-6 bg-violet-700/60"></div>
+          <div><span class="text-xs text-violet-300 block">SCORE</span><span id="arcade-score" class="text-lg font-black text-purple-300">0</span></div>
+          <div class="w-px h-6 bg-violet-700/60"></div>
+          <div><span class="text-xs text-violet-300 block">STREAK</span><span id="arcade-streak" class="text-lg font-black text-amber-300">0x</span></div>
+        </div>
+
+        <button onclick="quitChallenge()" class="pointer-events-auto bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-4 py-2 rounded-2xl transition cursor-pointer">
+          Exit Game
+        </button>
+      </div>
+
+      <!-- Canvas Arcade Area -->
+      <canvas id="arcade-canvas" class="w-full flex-1 block"></canvas>
+
+      <!-- Bottom Interactive Blaster Bar -->
+      <div class="p-4 bg-violet-950/90 border-t border-violet-800/60 flex items-center justify-center space-x-3 z-20">
+        <span class="text-sm font-extrabold text-purple-300">TARGET ANSWER:</span>
+        <input type="number" id="arcade-answer-input" placeholder="Type answer..." autocomplete="off"
+          class="w-44 text-center text-2xl font-black bg-violet-900/80 border-2 border-purple-400 rounded-xl py-1.5 text-white focus:outline-none">
+      </div>
+    </section>
+
+    <!-- 4. RESULTS & REVIEW SCREEN -->
+    <section id="screen-results" class="hidden w-full max-w-xl mx-auto flex flex-col justify-center h-full max-h-[92vh]">
+      <div class="bg-violet-950/80 backdrop-blur-2xl rounded-[2.5rem] p-5 sm:p-6 border border-violet-800/60 shadow-2xl space-y-4 flex flex-col justify-between overflow-hidden">
+        
+        <div class="text-center">
+          <h2 class="text-2xl font-black text-white">Challenge Complete!</h2>
+          <p id="res-subtitle" class="text-xs text-violet-300/80 mt-0.5">Here is how you performed</p>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-violet-900/40 border border-violet-800/60 p-3 rounded-2xl text-center">
+            <span class="text-xs text-violet-300 font-bold block">Score</span>
+            <span id="res-score" class="text-2xl font-black text-purple-300">0</span>
+          </div>
+          <div class="bg-violet-900/40 border border-violet-800/60 p-3 rounded-2xl text-center">
+            <span class="text-xs text-violet-300 font-bold block">Accuracy</span>
+            <span id="res-accuracy" class="text-2xl font-black text-emerald-400">0%</span>
+          </div>
+        </div>
+
+        <!-- Wrong Answer Interactive Review Section -->
+        <div class="flex-1 flex flex-col space-y-2 min-h-0">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xs font-black uppercase text-violet-300/80 tracking-wider">Review Missed Facts</h3>
+            <span id="res-missed-count" class="text-xs font-bold text-violet-400">0 Items</span>
+          </div>
+
+          <div id="res-review-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 max-h-[180px] pr-1">
+            <!-- Dynamic review items -->
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="showScreen('setup')" class="py-3.5 bg-violet-900/60 hover:bg-violet-800/60 text-violet-200 font-black text-sm rounded-2xl border border-violet-700/50 transition cursor-pointer">
+            PLAY AGAIN
+          </button>
+          <button id="res-arcade-btn" onclick="launchArcadeFromResults()" class="py-3.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg transition cursor-pointer flex items-center justify-center space-x-1">
+            <span>🚀 Space Blaster</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: GROWTH REPORT WINDOW -->
+  <div id="growth-modal" class="fixed inset-0 bg-violet-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-violet-800/60 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-black text-white">Growth Report: <span id="growth-student-name" class="text-purple-300">Aliya</span></h2>
+          <p class="text-xs text-violet-300/80">Track fact mastery and practice weak areas</p>
+        </div>
+        <button onclick="closeGrowthModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="px-5 pt-3 bg-violet-950/60 border-b border-violet-800/60 flex space-x-2">
+        <button onclick="switchGrowthTab('mult')" id="tab-growth-mult" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-purple-400 text-purple-300 bg-violet-900/60 cursor-pointer">
+          Multiplication (×)
+        </button>
+        <button onclick="switchGrowthTab('div')" id="tab-growth-div" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-violet-300/80 hover:text-white cursor-pointer">
+          Division (÷)
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+        
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Overall Accuracy</span>
+            <span id="growth-metric-acc" class="text-xl font-black text-emerald-400">0%</span>
+          </div>
+          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Mastered (≥85%)</span>
+            <span id="growth-metric-mastered" class="text-xl font-black text-purple-300">0</span>
+          </div>
+          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Needs Practice</span>
+            <span id="growth-metric-weak" class="text-xl font-black text-rose-400">0</span>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-violet-900/40 border border-violet-800/60 rounded-2xl p-4 h-48">
+          <canvas id="growthChart"></canvas>
+        </div>
+
+        <!-- Detailed Fact Grid -->
+        <div class="space-y-2">
+          <h3 class="text-xs font-black uppercase tracking-wider text-violet-300">Fact Family Mastery Breakdown</h3>
+          <div id="growth-fact-cards" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: STUDENT SELECTION WINDOW -->
+  <div id="student-modal" class="fixed inset-0 bg-violet-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-md p-5 space-y-4 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex justify-between items-center border-b border-violet-800/60 pb-3">
+        <div>
+          <h2 class="text-lg font-black text-white">Select Student Profile</h2>
+          <p class="text-xs text-violet-300/80">Choose a profile to load saved progress</p>
+        </div>
+        <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Search Input -->
+      <input type="text" id="student-search-input" oninput="renderStudentSelector()" placeholder="🔍 Search student name..."
+        class="w-full bg-violet-900/40 border border-violet-800/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+
+      <!-- Grid of Student Profiles -->
+      <div id="student-picker-grid" class="grid grid-cols-2 gap-2 overflow-y-auto custom-scrollbar flex-1 pr-1 max-h-60">
+        <!-- Dynamically rendered student profile cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: INVISIBLE TEACHER / ADMIN PORTAL (CTRL + SHIFT + 8) -->
+  <div id="teacher-modal" class="fixed inset-0 bg-violet-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-lg p-6 space-y-5 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-violet-800/60 pb-4">
+        <div>
+          <h2 class="text-xl font-black text-white">Teacher Admin Portal</h2>
+          <p class="text-xs text-violet-300/80">Manage student profiles & data (Shortcut: Ctrl + Shift + 8)</p>
+        </div>
+        <button onclick="closeTeacherModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Student List -->
+      <div class="space-y-2">
+        <h3 class="text-xs font-black uppercase text-violet-300">Existing Student Roster</h3>
+        <div id="teacher-student-list" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: SPACE BLASTER LOCKED ALERT MODAL -->
+  <div id="lock-modal" class="fixed inset-0 bg-violet-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-md p-6 space-y-5 shadow-2xl text-center">
+      <div class="w-16 h-16 rounded-3xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-3xl mx-auto text-purple-300 shadow-inner">
+        🔒
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-xl font-black text-white">Space Blaster Locked!</h3>
+        <p class="text-xs text-violet-300/80">Complete classic challenges with facts greater than 2 to unlock</p>
+      </div>
+
+      <div class="bg-violet-900/40 p-4 rounded-2xl border border-violet-800/80 space-y-3 text-left">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-extrabold text-violet-200">Unlock Progress:</span>
+          <span id="lock-modal-progress-count" class="text-xs font-black text-purple-300">0/5 Unique Challenges</span>
+        </div>
+        
+        <div class="w-full bg-violet-950 h-2.5 rounded-full overflow-hidden">
+          <div id="lock-modal-progress-bar" class="h-full bg-gradient-to-r from-violet-500 to-purple-400 transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div class="space-y-1 text-[11px] text-violet-300/80 pt-1 border-t border-violet-800/60">
+          <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Score <strong>> 80% accuracy</strong> in Classic Mode</span></p>
+          <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Use target facts strictly <strong>greater than 2</strong> (3s - 12s)</span></p>
+          <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Complete <strong>5 different math fact setups</strong></span></p>
+        </div>
+      </div>
+
+      <button onclick="closeLockModal()" class="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl transition cursor-pointer">
+        GOT IT!
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN SCRIPT ENGINE -->
+  <script>
+    /* Full Roster of Students */
+    const DEFAULT_ROSTER = [
+      'Aliya', 'Floyd', 'Alex', 'Dulce', 'Riley', 'Jasmine', 'Ileana', 'Gracie', 
+      'Linkin', 'Jada', 'Leium', 'Isabelle', 'Ryan', 'Abraham', 'Aria', 'Blake', 
+      'Charlotte', 'Lylah', 'Juliette', 'Heleina', 'Marilyn', 'Peyton', 'Adalisse', 
+      'Eric', 'Athena', 'Skylar', 'Mia', 'Mr. Lee'
+    ];
+
+    /* Global Application State */
+    const STATE = {
+      students: {},
+      activeStudent: 'Aliya',
+      selectedOp: 'mult',
+      selectedFacts: [3],
+      gameMode: 'classic',
+      quiz: {
+        active: false,
+        timer: 60,
+        timerInterval: null,
+        questionTimerBar: null,
+        score: 0,
+        streak: 0,
+        maxStreak: 0,
+        currentQuestion: null,
+        questionPool: [],
+        missedQuestions: [],
+        totalAttempted: 0
+      },
+      arcade: {
+        canvas: null,
+        ctx: null,
+        animId: null,
+        meteors: [],
+        particles: [],
+        lasers: [],
+        spawnTimer: 0,
+        baseSpeed: 1.0,
+        currentStreak: 0
+      },
+      growthTab: 'mult',
+      growthChartInstance: null
+    };
+
+    /* Audio Synthesizer (Web Audio API) */
+    const AUDIO = {
+      ctx: null,
+      enabled: true,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+      },
+      playTone(freq, type, duration) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      },
+      correct() {
+        this.playTone(587.33, 'sine', 0.1);
+        setTimeout(() => this.playTone(880, 'sine', 0.2), 80);
+      },
+      wrong() {
+        this.playTone(180, 'sawtooth', 0.25);
+      },
+      laser() {
+        this.playTone(900, 'square', 0.08);
+      },
+      explosion() {
+        this.playTone(120, 'triangle', 0.2);
+      }
+    };
+
+    function toggleAudio() {
+      AUDIO.enabled = !AUDIO.enabled;
+      document.getElementById('sound-icon').textContent = AUDIO.enabled ? '🔊' : '🔇';
+    }
+
+    /* Application Initialization */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadProfiles();
+      renderStudentSelector();
+      renderFactGrid();
+      setupAdminShortcut();
+      setupInputListeners();
+      updateLockStatusUI();
+    });
+
+    function loadProfiles() {
+      const saved = localStorage.getItem('mfm_students_v3');
+      if (saved) {
+        try {
+          STATE.students = JSON.parse(saved);
+        } catch(e) {
+          STATE.students = {};
+        }
+      }
+
+      // Ensure all roster students exist
+      DEFAULT_ROSTER.forEach(name => {
+        if (!STATE.students[name]) {
+          STATE.students[name] = createNewStudentObject();
+        }
+      });
+
+      saveProfiles();
+    }
+
+    function saveProfiles() {
+      localStorage.setItem('mfm_students_v3', JSON.stringify(STATE.students));
+    }
+
+    function createNewStudentObject() {
+      return {
+        multStats: Array(13).fill(0).map(() => ({ total: 0, correct: 0 })),
+        divStats: Array(13).fill(0).map(() => ({ total: 0, correct: 0 })),
+        qualifyingRuns: [] // Array of unique qualifying fact string configurations
+      };
+    }
+
+    /* Student Selector Modal Logic */
+    function openStudentModal() {
+      renderStudentSelector();
+      document.getElementById('student-modal').classList.remove('hidden');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('student-modal').classList.add('hidden');
+    }
+
+    function selectStudent(name) {
+      STATE.activeStudent = name;
+      renderStudentSelector();
+      updateLockStatusUI();
+      closeStudentModal();
+    }
+
+    function renderStudentSelector() {
+      const activeLabel = document.getElementById('active-student-label');
+      if (activeLabel) activeLabel.textContent = STATE.activeStudent;
+
+      const grid = document.getElementById('student-picker-grid');
+      if (!grid) return;
+
+      const searchTerm = (document.getElementById('student-search-input')?.value || '').toLowerCase().trim();
+      grid.innerHTML = '';
+
+      Object.keys(STATE.students)
+        .filter(name => name.toLowerCase().includes(searchTerm))
+        .forEach(name => {
+          const isActive = name === STATE.activeStudent;
+
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.onclick = () => selectStudent(name);
+          card.className = `p-2.5 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
+            isActive
+              ? 'bg-purple-600/40 border-purple-400 text-white shadow-md shadow-purple-600/20'
+              : 'bg-violet-900/40 border-violet-800/80 text-violet-200 hover:border-violet-700 hover:bg-violet-800/50'
+          }`;
+
+          card.innerHTML = `
+            <div class="flex items-center space-x-2 truncate">
+              <span class="text-xs">${isActive ? '⭐' : '👤'}</span>
+              <span class="font-bold text-xs truncate ${isActive ? 'text-purple-200' : 'text-violet-200'}">${name}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+    }
+
+    function renderFactGrid() {
+      const grid = document.getElementById('facts-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i <= 12; i++) {
+        const btn = document.createElement('button');
+        const isSelected = STATE.selectedFacts.includes(i);
+        btn.className = `fact-btn py-2 rounded-xl text-xs font-black border transition cursor-pointer ${
+          isSelected 
+            ? 'bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-md shadow-purple-600/20' 
+            : 'bg-violet-900/40 border-violet-800/80 text-violet-300 hover:text-white'
+        }`;
+        btn.textContent = `${i}s`;
+        btn.onclick = () => toggleFact(i);
+        grid.appendChild(btn);
+      }
+    }
+
+    function toggleFact(num) {
+      if (STATE.selectedFacts.includes(num)) {
+        if (STATE.selectedFacts.length > 1) {
+          STATE.selectedFacts = STATE.selectedFacts.filter(n => n !== num);
+        }
+      } else {
+        STATE.selectedFacts.push(num);
+      }
+      renderFactGrid();
+    }
+
+    function toggleAllFacts() {
+      if (STATE.selectedFacts.length === 13) {
+        STATE.selectedFacts = [3];
+      } else {
+        STATE.selectedFacts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      }
+      renderFactGrid();
+    }
+
+    function selectOperation(op) {
+      STATE.selectedOp = op;
+      document.querySelectorAll('.op-btn').forEach(btn => {
+        btn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer';
+      });
+      const activeBtn = document.getElementById(`op-${op}`);
+      activeBtn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30 cursor-pointer';
+    }
+
+    /* Lock Requirements Verification Logic */
+    function isArcadeUnlocked(studentName = STATE.activeStudent) {
+      const student = STATE.students[studentName];
+      if (!student || !student.qualifyingRuns) return false;
+      return student.qualifyingRuns.length >= 5;
+    }
+
+    function updateLockStatusUI() {
+      const unlocked = isArcadeUnlocked();
+      const label = document.getElementById('arcade-mode-label');
+      
+      if (label) {
+        label.innerHTML = unlocked ? '🚀 Space Blaster' : '🔒 Space Blaster';
+      }
+
+      const countLabel = document.getElementById('lock-modal-progress-count');
+      const bar = document.getElementById('lock-modal-progress-bar');
+      const student = STATE.students[STATE.activeStudent];
+      const count = student && student.qualifyingRuns ? student.qualifyingRuns.length : 0;
+
+      if (countLabel) countLabel.textContent = `${count}/5 Unique Challenges`;
+      if (bar) bar.style.width = `${Math.min(100, (count / 5) * 100)}%`;
+    }
+
+    function selectGameMode(mode) {
+      if (mode === 'arcade' && !isArcadeUnlocked()) {
+        openLockModal();
+        return;
+      }
+
+      STATE.gameMode = mode;
+      const cBtn = document.getElementById('mode-classic-btn');
+      const aBtn = document.getElementById('mode-arcade-btn');
+      if (mode === 'classic') {
+        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white cursor-pointer';
+        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer';
+      } else {
+        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white cursor-pointer';
+        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer';
+      }
+    }
+
+    function openLockModal() {
+      updateLockStatusUI();
+      document.getElementById('lock-modal').classList.remove('hidden');
+    }
+
+    function closeLockModal() {
+      document.getElementById('lock-modal').classList.add('hidden');
+    }
+
+    function generateQuestionPool() {
+      const pool = [];
+      STATE.selectedFacts.forEach(fact => {
+        for (let j = 0; j <= 12; j++) {
+          if (STATE.selectedOp === 'mult') {
+            pool.push({ text: `${fact} × ${j}`, answer: fact * j, family: fact, type: 'mult' });
+          } else if (STATE.selectedOp === 'div') {
+            const product = fact * j;
+            pool.push({ text: `${product} ÷ ${fact}`, answer: j, family: fact, type: 'div' });
+          } else {
+            pool.push({ text: `${fact} × ${j}`, answer: fact * j, family: fact, type: 'mult' });
+            const product = fact * j;
+            pool.push({ text: `${product} ÷ ${fact}`, answer: j, family: fact, type: 'div' });
+          }
+        }
+      });
+      return pool.sort(() => Math.random() - 0.5);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+    }
+
+    /* START CHALLENGE */
+    function startChallenge() {
+      if (STATE.gameMode === 'arcade' && !isArcadeUnlocked()) {
+        openLockModal();
+        return;
+      }
+
+      STATE.quiz.questionPool = generateQuestionPool();
+      STATE.quiz.score = 0;
+      STATE.quiz.streak = 0;
+      STATE.quiz.maxStreak = 0;
+      STATE.quiz.missedQuestions = [];
+      STATE.quiz.totalAttempted = 0;
+      STATE.quiz.timer = 60;
+
+      if (STATE.gameMode === 'classic') {
+        showScreen('quiz');
+        document.getElementById('quiz-score-badge').textContent = `Score: 0`;
+        document.getElementById('quiz-total-timer').textContent = `60s`;
+        
+        STATE.quiz.timerInterval = setInterval(() => {
+          STATE.quiz.timer--;
+          document.getElementById('quiz-total-timer').textContent = `${STATE.quiz.timer}s`;
+          if (STATE.quiz.timer <= 0) endChallenge();
+        }, 1000);
+
+        nextClassicQuestion();
+      } else {
+        showScreen('arcade');
+        startArcadeMode();
+      }
+    }
+
+    function nextClassicQuestion() {
+      if (STATE.quiz.questionPool.length === 0) {
+        STATE.quiz.questionPool = generateQuestionPool();
+      }
+      STATE.quiz.currentQuestion = STATE.quiz.questionPool.pop();
+      document.getElementById('quiz-question-text').textContent = `${STATE.quiz.currentQuestion.text} = ?`;
+      
+      const input = document.getElementById('quiz-answer-input');
+      input.value = '';
+      input.focus();
+
+      document.getElementById('quiz-feedback-banner').textContent = '';
+
+      const bar = document.getElementById('question-bar-timer');
+      bar.style.transition = 'none';
+      bar.style.width = '100%';
+      setTimeout(() => {
+        bar.style.transition = 'width 5s linear';
+        bar.style.width = '0%';
+      }, 50);
+
+      clearTimeout(STATE.quiz.questionTimerBar);
+      STATE.quiz.questionTimerBar = setTimeout(() => {
+        handleAnswer(false, true);
+      }, 5050);
+    }
+
+    function setupInputListeners() {
+      const input = document.getElementById('quiz-answer-input');
+      
+      input.addEventListener('input', () => {
+        if (!STATE.quiz.currentQuestion || !input.value) return;
+        const userVal = parseInt(input.value);
+        const expectedLen = STATE.quiz.currentQuestion.answer.toString().length;
+
+        if (input.value.length >= expectedLen) {
+          if (userVal === STATE.quiz.currentQuestion.answer) {
+            handleAnswer(true);
+          } else {
+            handleAnswer(false);
+          }
+        }
+      });
+      
+      input.addEventListener('wheel', (e) => e.preventDefault());
+    }
+
+    function handleAnswer(isCorrect, isTimeout = false) {
+      clearTimeout(STATE.quiz.questionTimerBar);
+      STATE.quiz.totalAttempted++;
+      const q = STATE.quiz.currentQuestion;
+      const student = STATE.students[STATE.activeStudent];
+
+      const stats = q.type === 'mult' ? student.multStats[q.family] : student.divStats[q.family];
+      stats.total++;
+
+      const banner = document.getElementById('quiz-feedback-banner');
+
+      if (isCorrect) {
+        stats.correct++;
+        STATE.quiz.score += 10;
+        STATE.quiz.streak++;
+        if (STATE.quiz.streak > STATE.quiz.maxStreak) STATE.quiz.maxStreak = STATE.quiz.streak;
+        banner.className = 'h-6 text-sm font-extrabold text-emerald-400';
+        banner.textContent = '✓ Correct!';
+        AUDIO.correct();
+      } else {
+        STATE.quiz.streak = 0;
+        STATE.quiz.missedQuestions.push({
+          question: q.text,
+          userAnswer: isTimeout ? 'Timed Out' : document.getElementById('quiz-answer-input').value,
+          correctAnswer: q.answer
+        });
+        banner.className = 'h-6 text-sm font-extrabold text-rose-400';
+        banner.textContent = isTimeout ? `⏰ Time Up! Answer: ${q.answer}` : `✗ Wrong! Answer: ${q.answer}`;
+        AUDIO.wrong();
+      }
+
+      saveProfiles();
+      document.getElementById('quiz-score-badge').textContent = `Score: ${STATE.quiz.score}`;
+
+      setTimeout(() => {
+        if (STATE.quiz.timer > 0) nextClassicQuestion();
+      }, isCorrect ? 300 : 1100);
+    }
+
+    function quitChallenge() {
+      clearInterval(STATE.quiz.timerInterval);
+      clearTimeout(STATE.quiz.questionTimerBar);
+      if (STATE.arcade.animId) cancelAnimationFrame(STATE.arcade.animId);
+      showScreen('setup');
+    }
+
+    function startArcadeMode() {
+      STATE.arcade.canvas = document.getElementById('arcade-canvas');
+      STATE.arcade.ctx = STATE.arcade.canvas.getContext('2d');
+      STATE.arcade.meteors = [];
+      STATE.arcade.particles = [];
+      STATE.arcade.lasers = [];
+      STATE.arcade.spawnTimer = 0;
+      STATE.arcade.currentStreak = 0;
+      
+      const input = document.getElementById('arcade-answer-input');
+      input.value = '';
+      input.focus();
+
+      const rect = STATE.arcade.canvas.parentElement.getBoundingClientRect();
+      STATE.arcade.canvas.width = rect.width;
+      STATE.arcade.canvas.height = rect.height - 60;
+
+      // Handle clearing answer input box when submitted or wrong answer
+      input.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          checkArcadeAnswer(input.value);
+          input.value = ''; // Clear answer box on Enter
+        }
+      };
+
+      input.oninput = () => {
+        if (!input.value) return;
+        checkArcadeAnswer(input.value);
+      };
+
+      STATE.quiz.timerInterval = setInterval(() => {
+        STATE.quiz.timer--;
+        document.getElementById('arcade-timer').textContent = `${STATE.quiz.timer}s`;
+        if (STATE.quiz.timer <= 0) endChallenge();
+      }, 1000);
+
+      arcadeGameLoop();
+    }
+
+    function checkArcadeAnswer(valStr) {
+      const input = document.getElementById('arcade-answer-input');
+      const val = parseInt(valStr);
+      if (isNaN(val)) return;
+
+      const hitIdx = STATE.arcade.meteors.findIndex(m => m.answer === val);
+      if (hitIdx !== -1) {
+        const target = STATE.arcade.meteors[hitIdx];
+        
+        createLaserBeam(target.x, target.y);
+        createExplosion(target.x, target.y);
+        AUDIO.laser();
+        AUDIO.explosion();
+
+        STATE.arcade.currentStreak++;
+        STATE.quiz.score += 10 * Math.min(STATE.arcade.currentStreak, 5);
+        STATE.quiz.totalAttempted++;
+        
+        const student = STATE.students[STATE.activeStudent];
+        const stats = target.type === 'mult' ? student.multStats[target.family] : student.divStats[target.family];
+        stats.total++;
+        stats.correct++;
+        saveProfiles();
+
+        STATE.arcade.meteors.splice(hitIdx, 1);
+        input.value = ''; // Clear answer box on correct answer
+        updateArcadeHud();
+      }
+    }
+
+    function updateArcadeHud() {
+      document.getElementById('arcade-score').textContent = STATE.quiz.score;
+      document.getElementById('arcade-streak').textContent = `${STATE.arcade.currentStreak}x`;
+    }
+
+    function arcadeGameLoop() {
+      const ctx = STATE.arcade.ctx;
+      const canvas = STATE.arcade.canvas;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const dynamicSpawnDelay = Math.max(45, 120 - (STATE.arcade.currentStreak * 5));
+      STATE.arcade.spawnTimer++;
+      
+      if (STATE.arcade.spawnTimer >= dynamicSpawnDelay) {
+        STATE.arcade.spawnTimer = 0;
+        if (STATE.quiz.questionPool.length === 0) STATE.quiz.questionPool = generateQuestionPool();
+        const q = STATE.quiz.questionPool.pop();
+        
+        const meteorSpeed = STATE.arcade.baseSpeed + (STATE.arcade.currentStreak * 0.15);
+        
+        STATE.arcade.meteors.push({
+          x: Math.random() * (canvas.width - 120) + 60,
+          y: -40,
+          text: q.text,
+          answer: q.answer,
+          family: q.family,
+          type: q.type,
+          speed: meteorSpeed
+        });
+      }
+
+      for (let i = STATE.arcade.meteors.length - 1; i >= 0; i--) {
+        const m = STATE.arcade.meteors[i];
+        m.y += m.speed;
+
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 28, 0, Math.PI * 2);
+        ctx.fillStyle = '#4c1d95';
+        ctx.fill();
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 15px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(m.text, m.x, m.y);
+
+        if (m.y > canvas.height - 20) {
+          STATE.arcade.currentStreak = 0;
+          STATE.quiz.totalAttempted++;
+          STATE.quiz.missedQuestions.push({
+            question: m.text,
+            userAnswer: 'Breached',
+            correctAnswer: m.answer
+          });
+          AUDIO.wrong();
+          STATE.arcade.meteors.splice(i, 1);
+          updateArcadeHud();
+        }
+      }
+
+      for (let i = STATE.arcade.particles.length - 1; i >= 0; i--) {
+        const p = STATE.arcade.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.04;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
+        ctx.fill();
+        if (p.life <= 0) STATE.arcade.particles.splice(i, 1);
+      }
+
+      for (let i = STATE.arcade.lasers.length - 1; i >= 0; i--) {
+        const l = STATE.arcade.lasers[i];
+        l.life -= 0.1;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height);
+        ctx.lineTo(l.tx, l.ty);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${l.life})`;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        if (l.life <= 0) STATE.arcade.lasers.splice(i, 1);
+      }
+
+      STATE.arcade.animId = requestAnimationFrame(arcadeGameLoop);
+    }
+
+    function createExplosion(x, y) {
+      for (let i = 0; i < 16; i++) {
+        STATE.arcade.particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          size: Math.random() * 4 + 2,
+          life: 1.0,
+          color: '168, 85, 247'
+        });
+      }
+    }
+
+    function createLaserBeam(tx, ty) {
+      STATE.arcade.lasers.push({ tx, ty, life: 1.0 });
+    }
+
+    function endChallenge() {
+      clearInterval(STATE.quiz.timerInterval);
+      clearTimeout(STATE.quiz.questionTimerBar);
+      if (STATE.arcade.animId) cancelAnimationFrame(STATE.arcade.animId);
+
+      showScreen('results');
+      
+      const acc = STATE.quiz.totalAttempted > 0 
+        ? Math.round(((STATE.quiz.totalAttempted - STATE.quiz.missedQuestions.length) / STATE.quiz.totalAttempted) * 100) 
+        : 100;
+
+      const student = STATE.students[STATE.activeStudent];
+
+      // Evaluate Qualification Rules for Space Blaster in Classic Mode
+      if (STATE.gameMode === 'classic') {
+        const hasOnlyFactsAbove2 = STATE.selectedFacts.every(f => f > 2);
+        const configKey = `${STATE.selectedOp}:${[...STATE.selectedFacts].sort((a,b)=>a-b).join(',')}`;
+
+        if (!student.qualifyingRuns) student.qualifyingRuns = [];
+
+        if (acc > 80 && hasOnlyFactsAbove2) {
+          if (!student.qualifyingRuns.includes(configKey)) {
+            student.qualifyingRuns.push(configKey);
+            saveProfiles();
+          }
+        }
+      }
+
+      updateLockStatusUI();
+
+      document.getElementById('res-score').textContent = STATE.quiz.score;
+      document.getElementById('res-accuracy').textContent = `${acc}%`;
+      document.getElementById('res-missed-count').textContent = `${STATE.quiz.missedQuestions.length} Items`;
+
+      const sub = document.getElementById('res-subtitle');
+      sub.textContent = "Here is how you performed";
+
+      const resArcadeBtn = document.getElementById('res-arcade-btn');
+      if (isArcadeUnlocked()) {
+        resArcadeBtn.className = 'py-3.5 px-5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer';
+        resArcadeBtn.innerHTML = `<span>🚀 Play Space Blaster</span>`;
+      } else {
+        resArcadeBtn.className = 'py-3.5 px-5 bg-violet-900/40 border border-violet-800/80 text-violet-400 font-black text-sm rounded-2xl transition flex items-center justify-center space-x-2 cursor-pointer';
+        resArcadeBtn.innerHTML = `<span>🔒 Space Blaster</span>`;
+      }
+
+      const reviewContainer = document.getElementById('res-review-container');
+      reviewContainer.innerHTML = '';
+
+      if (STATE.quiz.missedQuestions.length === 0) {
+        reviewContainer.innerHTML = `
+          <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-center text-emerald-400 font-bold text-xs">
+            🌟 Perfect Score! No missed questions to review!
+          </div>
+        `;
+      } else {
+        STATE.quiz.missedQuestions.forEach((item, idx) => {
+          const div = document.createElement('div');
+          div.className = 'bg-violet-900/40 border border-violet-800/80 p-2.5 rounded-2xl flex items-center justify-between text-xs';
+          div.id = `review-item-${idx}`;
+          div.innerHTML = `
+            <div class="space-y-0.5">
+              <span class="font-black text-white text-xs block">${item.question}</span>
+              <span class="text-rose-400 font-bold text-[11px]">Your answer: ${item.userAnswer}</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <input type="number" id="retry-input-${idx}" placeholder="?" 
+                class="w-14 bg-violet-950 border border-violet-700/80 text-center font-bold text-white py-1 rounded-xl focus:border-purple-400 focus:outline-none text-xs">
+              <button onclick="retryQuestion(${idx}, ${item.correctAnswer})" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1 rounded-xl text-xs cursor-pointer">
+                Check
+              </button>
+            </div>
+          `;
+          reviewContainer.appendChild(div);
+        });
+      }
+    }
+
+    function launchArcadeFromResults() {
+      if (isArcadeUnlocked()) {
+        selectGameMode('arcade');
+        startChallenge();
+      } else {
+        openLockModal();
+      }
+    }
+
+    function retryQuestion(idx, correctAnswer) {
+      const input = document.getElementById(`retry-input-${idx}`);
+      const val = parseInt(input.value);
+      const row = document.getElementById(`review-item-${idx}`);
+
+      if (val === correctAnswer) {
+        row.className = 'bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-2xl flex items-center justify-between text-xs';
+        row.innerHTML = `
+          <span class="font-bold text-emerald-400">✓ Corrected! (${correctAnswer})</span>
+          <span class="text-xs text-emerald-300 font-extrabold">Good Job!</span>
+        `;
+        AUDIO.correct();
+      } else {
+        input.className = 'w-14 bg-rose-500/20 border border-rose-500 text-center font-bold text-rose-300 py-1 rounded-xl text-xs';
+        input.value = '';
+        input.placeholder = `${correctAnswer}`;
+        AUDIO.wrong();
+      }
+    }
+
+    function openGrowthModal() {
+      document.getElementById('growth-modal').classList.remove('hidden');
+      document.getElementById('growth-student-name').textContent = STATE.activeStudent;
+      renderGrowthReport();
+    }
+
+    function closeGrowthModal() {
+      document.getElementById('growth-modal').classList.add('hidden');
+    }
+
+    function switchGrowthTab(type) {
+      STATE.growthTab = type;
+      document.querySelectorAll('.growth-tab').forEach(t => {
+        t.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-violet-300/80 hover:text-white cursor-pointer';
+      });
+      const active = document.getElementById(`tab-growth-${type}`);
+      active.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-purple-400 text-purple-300 bg-violet-900/60 cursor-pointer';
+      renderGrowthReport();
+    }
+
+    function renderGrowthReport() {
+      const student = STATE.students[STATE.activeStudent];
+      const statsArray = STATE.growthTab === 'mult' ? student.multStats : student.divStats;
+
+      let totalSolved = 0;
+      let totalCorrect = 0;
+      let masteredCount = 0;
+      let weakCount = 0;
+
+      const labels = [];
+      const accuracyData = [];
+
+      statsArray.forEach((stat, i) => {
+        labels.push(`${i}s`);
+        totalSolved += stat.total;
+        totalCorrect += stat.correct;
+        const acc = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0;
+        accuracyData.push(acc);
+
+        if (stat.total > 0 && acc >= 85) masteredCount++;
+        if (stat.total > 0 && acc < 75) weakCount++;
+      });
+
+      const overallAcc = totalSolved > 0 ? Math.round((totalCorrect / totalSolved) * 100) : 0;
+
+      document.getElementById('growth-metric-acc').textContent = `${overallAcc}%`;
+      document.getElementById('growth-metric-mastered').textContent = masteredCount;
+      document.getElementById('growth-metric-weak').textContent = weakCount;
+
+      const ctx = document.getElementById('growthChart').getContext('2d');
+      if (STATE.growthChartInstance) STATE.growthChartInstance.destroy();
+
+      STATE.growthChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Accuracy %',
+            data: accuracyData,
+            backgroundColor: accuracyData.map(val => val >= 85 ? '#a855f7' : val >= 75 ? '#f59e0b' : '#f43f5e'),
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { max: 100, beginAtZero: true, grid: { color: '#3b0764' }, ticks: { color: '#c084fc' } },
+            x: { grid: { display: false }, ticks: { color: '#c084fc' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      const grid = document.getElementById('growth-fact-cards');
+      grid.innerHTML = '';
+
+      statsArray.forEach((stat, i) => {
+        const acc = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0;
+        const card = document.createElement('div');
+        card.className = 'bg-violet-900/40 border border-violet-800/80 p-3 rounded-2xl flex flex-col justify-between space-y-2';
+        card.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-black text-white text-xs">${i}s Family</span>
+            <span class="text-xs font-bold ${acc >= 85 ? 'text-purple-300' : acc >= 75 ? 'text-amber-400' : 'text-rose-400'}">${acc}%</span>
+          </div>
+          <div class="w-full bg-violet-950 h-1.5 rounded-full overflow-hidden">
+            <div class="h-full ${acc >= 85 ? 'bg-purple-500' : acc >= 75 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${acc}%"></div>
+          </div>
+          <button onclick="practiceTargetedFact(${i})" class="w-full py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 rounded-xl text-[11px] font-bold transition cursor-pointer">
+            Practice ${i}s
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function practiceTargetedFact(factNum) {
+      STATE.selectedFacts = [factNum];
+      renderFactGrid();
+      closeGrowthModal();
+      showScreen('setup');
+    }
+
+    function setupAdminShortcut() {
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === '8' || e.code === 'Digit8' || e.code === 'Numpad8' || e.key === '*')) {
+          e.preventDefault();
+          openTeacherModal();
+        }
+      });
+    }
+
+    function openTeacherModal() {
+      document.getElementById('teacher-modal').classList.remove('hidden');
+      renderTeacherStudentList();
+    }
+
+    function closeTeacherModal() {
+      document.getElementById('teacher-modal').classList.add('hidden');
+    }
+
+    function renderTeacherStudentList() {
+      const container = document.getElementById('teacher-student-list');
+      container.innerHTML = '';
+
+      Object.keys(STATE.students).forEach(name => {
+        const item = document.createElement('div');
+        item.className = 'bg-violet-900/40 border border-violet-800/80 p-3 rounded-2xl flex items-center justify-between text-xs';
+        item.innerHTML = `
+          <span class="font-bold text-white">${name}</span>
+          <div class="flex items-center space-x-2">
+            <button onclick="renameStudent('${name}')" class="text-purple-300 hover:underline font-semibold cursor-pointer">Rename</button>
+            <button onclick="deleteStudent('${name}')" class="text-rose-400 hover:underline font-semibold cursor-pointer">Delete</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renameStudent(oldName) {
+      const newName = prompt('Enter new student name:', oldName);
+      if (!newName || newName.trim() === '' || STATE.students[newName]) return;
+
+      STATE.students[newName] = STATE.students[oldName];
+      delete STATE.students[oldName];
+
+      if (STATE.activeStudent === oldName) STATE.activeStudent = newName;
+
+      saveProfiles();
+      renderStudentSelector();
+      renderTeacherStudentList();
+    }
+
+    function deleteStudent(name) {
+      if (Object.keys(STATE.students).length <= 1) {
+        alert('Cannot delete the only student profile.');
+        return;
+      }
+      if (confirm(`Delete student profile "${name}"?`)) {
+        delete STATE.students[name];
+        if (STATE.activeStudent === name) {
+          STATE.activeStudent = Object.keys(STATE.students)[0];
+        }
+        saveProfiles();
+        renderStudentSelector();
+        renderTeacherStudentList();
+      }
+    }
+  </script>
+</body>
+</html>
