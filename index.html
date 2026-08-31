@@ -13,8 +13,22 @@
       theme: {
         extend: {
           colors: {
-            brand: { 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9' },
-            violetbg: { 900: '#2e1065', 950: '#1e1b4b' }
+            deepbg: {
+              950: '#120a3a',
+              900: '#1d1057', // Requested primary color hex
+              800: '#281775',
+              700: '#39229e'
+            },
+            brand: { 
+              400: '#a5b4fc',
+              500: '#818cf8', 
+              600: '#6366f1', 
+              700: '#4f46e5' 
+            },
+            accent: {
+              500: '#a855f7',
+              400: '#c084fc'
+            }
           }
         }
       }
@@ -26,6 +40,7 @@
       overflow: hidden;
       touch-action: manipulation;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
@@ -35,18 +50,82 @@
     input[type=number] {
       -moz-appearance: textfield;
     }
+    .custom-scrollbar {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(30, 27, 75, 0.6);
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(139, 92, 246, 0.5);
+      background: rgba(29, 16, 87, 0.8);
       border-radius: 9999px;
     }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(129, 140, 248, 0.5);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(168, 85, 247, 0.8);
+    }
 
-    /* Ambient Soft Violet Glow Animation */
+    /* Micro-Interactions & Transitions */
+    button, input, a {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(1px) scale(0.96) !important;
+    }
+
+    /* Keyframe Animations for Screens and Modals */
+    @keyframes screenIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.97) translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes modalFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes modalPopIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(16px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .animate-screen-in {
+      animation: screenIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-modal-backdrop {
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-modal-content {
+      animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Ambient Soft Glow Animation */
     @keyframes ambientGlow {
       0%, 100% { opacity: 0.6; transform: scale(1); }
       50% { opacity: 0.85; transform: scale(1.08); }
@@ -56,41 +135,41 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-violet-950 via-purple-950 to-indigo-950 text-slate-100 font-sans h-full flex flex-col justify-between overflow-hidden select-none relative">
+<body class="bg-gradient-to-br from-deepbg-950 via-deepbg-900 to-deepbg-800 text-slate-100 font-sans h-full flex flex-col justify-between overflow-hidden select-none relative">
 
-  <!-- Ambient Soft Violet Atmospheric Glow Elements -->
-  <div class="absolute -top-32 -left-32 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl pointer-events-none animate-glow-slow"></div>
-  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/25 rounded-full blur-3xl pointer-events-none animate-glow-slow" style="animation-delay: 4s;"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- Ambient Soft Atmospheric Glow Elements -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/25 rounded-full blur-3xl pointer-events-none animate-glow-slow"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none animate-glow-slow" style="animation-delay: 4s;"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
   <!-- TOP HEADER -->
-  <header class="h-14 px-4 sm:px-8 border-b border-violet-800/40 bg-violet-950/40 backdrop-blur-xl flex items-center justify-between shrink-0 z-30">
+  <header class="h-14 px-4 sm:px-8 border-b border-deepbg-700/50 bg-deepbg-900/90 flex items-center justify-between shrink-0 z-30">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-purple-500 to-indigo-400 flex items-center justify-center font-black text-xl shadow-lg shadow-purple-500/30">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-brand-500 to-accent-400 flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-500/30">
         ∑
       </div>
-      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-violet-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+      <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-indigo-200 via-violet-200 to-pink-200 bg-clip-text text-transparent">
         Math Fact
       </span>
     </div>
 
     <div class="flex items-center space-x-3">
       <!-- Active Profile Selector Button -->
-      <button id="student-select-btn" onclick="openStudentModal()" class="flex items-center space-x-2 bg-violet-900/50 hover:bg-violet-800/60 border border-violet-700/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-violet-200 transition cursor-pointer backdrop-blur-md">
-        <span class="text-violet-300">👤</span>
-        <span class="text-violet-300/80">Student:</span>
-        <span id="active-student-label" class="text-purple-200 font-bold">Aliya</span>
-        <span class="text-violet-400 text-[10px]">▼</span>
+      <button id="student-select-btn" onclick="openStudentModal()" class="flex items-center space-x-2 bg-deepbg-800/60 hover:bg-deepbg-700/60 border border-deepbg-700/80 rounded-xl px-3 py-1.5 text-xs font-semibold text-indigo-200 transition cursor-pointer">
+        <span class="text-indigo-300">👤</span>
+        <span class="text-indigo-300/80">Student:</span>
+        <span id="active-student-label" class="text-brand-400 font-bold">Aliya</span>
+        <span class="text-indigo-400 text-[10px]">▼</span>
       </button>
 
       <!-- Growth Report Window Button -->
-      <button id="open-growth-btn" onclick="openGrowthModal()" class="flex items-center space-x-2 bg-purple-600/30 hover:bg-purple-600/40 border border-purple-400/40 text-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer backdrop-blur-md shadow-sm">
-        <svg class="w-4 h-4 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+      <button id="open-growth-btn" onclick="openGrowthModal()" class="flex items-center space-x-2 bg-brand-600/30 hover:bg-brand-600/40 border border-brand-400/40 text-indigo-200 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shadow-sm">
+        <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
         <span>Growth Report</span>
       </button>
 
       <!-- Audio Mute/Unmute Toggle -->
-      <button id="sound-toggle-btn" onclick="toggleAudio()" class="p-2 bg-violet-900/50 hover:bg-violet-800/60 border border-violet-700/50 rounded-xl text-violet-200 transition cursor-pointer backdrop-blur-md" title="Toggle Sound SFX">
+      <button id="sound-toggle-btn" onclick="toggleAudio()" class="p-2 bg-deepbg-800/60 hover:bg-deepbg-700/60 border border-deepbg-700/80 rounded-xl text-indigo-200 transition cursor-pointer" title="Toggle Sound SFX">
         <span id="sound-icon">🔊</span>
       </button>
     </div>
@@ -100,22 +179,22 @@
   <main class="flex-1 relative flex items-center justify-center p-3 sm:p-4 overflow-hidden z-10">
 
     <!-- 1. SETUP SCREEN -->
-    <section id="screen-setup" class="w-full max-w-xl mx-auto flex flex-col justify-center h-full max-h-[92vh]">
-      <div class="bg-violet-950/70 backdrop-blur-2xl rounded-[2.5rem] p-5 sm:p-6 border border-violet-800/50 shadow-2xl shadow-purple-950/80 space-y-4 flex flex-col justify-between overflow-hidden">
+    <section id="screen-setup" class="w-full max-w-xl mx-auto flex flex-col justify-center h-full max-h-[92vh] animate-screen-in">
+      <div class="bg-deepbg-900/95 rounded-[2.5rem] p-5 sm:p-6 border border-deepbg-700/60 shadow-2xl shadow-deepbg-950/90 space-y-4 flex flex-col justify-between overflow-hidden">
         
         <div>
-          <h1 class="text-2xl sm:text-3xl font-black text-center bg-gradient-to-r from-white via-violet-100 to-purple-200 bg-clip-text text-transparent tracking-tight">Fact Challenge</h1>
-          <p class="text-violet-300/80 text-xs sm:text-sm text-center mt-1 font-medium">Select your operations and facts to begin</p>
+          <h1 class="text-2xl sm:text-3xl font-black text-center bg-gradient-to-r from-white via-indigo-100 to-violet-200 bg-clip-text text-transparent tracking-tight">Fact Challenge</h1>
+          <p class="text-indigo-200/80 text-xs sm:text-sm text-center mt-1 font-medium">Select your operations and facts to begin</p>
         </div>
 
         <!-- Mode Selection -->
         <div class="space-y-1.5">
-          <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Challenge Mode</label>
+          <label class="text-xs font-extrabold text-indigo-300/80 tracking-wider uppercase">Challenge Mode</label>
           <div class="grid grid-cols-2 gap-2">
-            <button id="mode-classic-btn" onclick="selectGameMode('classic')" class="py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white shadow-lg shadow-purple-600/20 cursor-pointer">
+            <button id="mode-classic-btn" onclick="selectGameMode('classic')" class="py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-brand-600/40 border-brand-400 text-white shadow-lg shadow-brand-600/20 cursor-pointer">
               <span>⚡ Classic 60s</span>
             </button>
-            <button id="mode-arcade-btn" onclick="selectGameMode('arcade')" class="relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer">
+            <button id="mode-arcade-btn" onclick="selectGameMode('arcade')" class="relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 hover:text-white cursor-pointer">
               <span id="arcade-mode-label">🚀 Space Blaster</span>
             </button>
           </div>
@@ -123,15 +202,15 @@
 
         <!-- Operation Selection -->
         <div class="space-y-1.5">
-          <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Operation</label>
+          <label class="text-xs font-extrabold text-indigo-300/80 tracking-wider uppercase">Operation</label>
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="selectOperation('mult')" id="op-mult" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30 cursor-pointer">
+            <button onclick="selectOperation('mult')" id="op-mult" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-brand-600 to-accent-500 border-brand-400 text-white shadow-lg shadow-brand-600/30 cursor-pointer">
               Multiplication (×)
             </button>
-            <button onclick="selectOperation('div')" id="op-div" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer">
+            <button onclick="selectOperation('div')" id="op-div" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 cursor-pointer">
               Division (÷)
             </button>
-            <button onclick="selectOperation('mix')" id="op-mix" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer">
+            <button onclick="selectOperation('mix')" id="op-mix" class="op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 cursor-pointer">
               Mixed (× & ÷)
             </button>
           </div>
@@ -140,8 +219,8 @@
         <!-- Fact Family Chooser -->
         <div class="space-y-1.5">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-extrabold text-violet-300/80 tracking-wider uppercase">Target Fact Tables</label>
-            <button onclick="toggleAllFacts()" class="text-xs text-purple-300 font-bold hover:underline cursor-pointer">Select All</button>
+            <label class="text-xs font-extrabold text-indigo-300/80 tracking-wider uppercase">Target Fact Tables</label>
+            <button onclick="toggleAllFacts()" class="text-xs text-brand-400 font-bold hover:underline cursor-pointer">Select All</button>
           </div>
           <div id="facts-grid" class="grid grid-cols-5 gap-1.5 sm:gap-2">
             <!-- Populated dynamically -->
@@ -149,7 +228,7 @@
         </div>
 
         <!-- Start Button -->
-        <button onclick="startChallenge()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-purple-600/35 active:scale-[0.98] transition cursor-pointer">
+        <button onclick="startChallenge()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-brand-600/35 transition cursor-pointer hover:shadow-brand-500/50">
           LAUNCH CHALLENGE
         </button>
       </div>
@@ -157,7 +236,7 @@
 
     <!-- 2. CLASSIC QUIZ SCREEN -->
     <section id="screen-quiz" class="hidden w-full max-w-lg mx-auto flex flex-col justify-center h-full max-h-[92vh]">
-      <div class="bg-violet-950/80 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-violet-800/50 shadow-2xl space-y-5 relative overflow-hidden">
+      <div class="bg-deepbg-900/95 rounded-[2.5rem] p-6 border border-deepbg-700/60 shadow-2xl space-y-5 relative overflow-hidden">
         
         <!-- Header Timers & Quit -->
         <div class="flex items-center justify-between">
@@ -166,7 +245,7 @@
             <span id="quiz-total-timer" class="text-2xl font-black text-white">60s</span>
           </div>
           <div class="flex items-center space-x-3">
-            <span id="quiz-score-badge" class="bg-purple-600/30 border border-purple-400/40 text-purple-200 font-black text-sm px-3 py-1 rounded-full">
+            <span id="quiz-score-badge" class="bg-brand-600/30 border border-brand-400/40 text-brand-400 font-black text-sm px-3 py-1 rounded-full">
               Score: 0
             </span>
             <button onclick="quitChallenge()" class="bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer">
@@ -176,19 +255,19 @@
         </div>
 
         <!-- 5-Second Question Visual Bar Timer -->
-        <div class="w-full bg-violet-900/60 h-2.5 rounded-full overflow-hidden">
-          <div id="question-bar-timer" class="bg-gradient-to-r from-purple-400 to-indigo-400 h-full w-full transition-all linear duration-100"></div>
+        <div class="w-full bg-deepbg-800/80 h-2.5 rounded-full overflow-hidden">
+          <div id="question-bar-timer" class="bg-gradient-to-r from-brand-400 to-accent-400 h-full w-full transition-all linear duration-100"></div>
         </div>
 
         <!-- Question Display Card -->
-        <div class="bg-violet-950/90 border border-violet-800/60 rounded-3xl p-8 flex flex-col items-center justify-center space-y-4 shadow-inner relative">
+        <div class="bg-deepbg-950/80 border border-deepbg-700/60 rounded-3xl p-8 flex flex-col items-center justify-center space-y-4 shadow-inner relative">
           <div id="quiz-question-text" class="text-5xl sm:text-6xl font-black tracking-tight text-white">
             2 × 3 = ?
           </div>
 
           <!-- Answer Box -->
           <input type="number" id="quiz-answer-input" placeholder="?" autocomplete="off"
-            class="w-36 text-center text-4xl font-black bg-violet-900/60 border-2 border-purple-400/70 focus:border-purple-300 rounded-2xl py-2 text-purple-100 focus:outline-none shadow-lg">
+            class="w-36 text-center text-4xl font-black bg-deepbg-800/80 border-2 border-brand-400/70 focus:border-brand-300 rounded-2xl py-2 text-indigo-100 focus:outline-none shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
           
           <!-- Instant Feedback Banner -->
           <div id="quiz-feedback-banner" class="h-6 text-sm font-extrabold transition-all text-center"></div>
@@ -197,15 +276,15 @@
     </section>
 
     <!-- 3. SPACE FACT BLASTER ARCADE SCREEN -->
-    <section id="screen-arcade" class="hidden w-full max-w-3xl h-full max-h-[92vh] flex flex-col relative rounded-[2.5rem] overflow-hidden border border-violet-800/60 bg-violet-950/90 backdrop-blur-xl shadow-2xl">
+    <section id="screen-arcade" class="hidden w-full max-w-3xl h-full max-h-[92vh] flex flex-col relative rounded-[2.5rem] overflow-hidden border border-deepbg-700/60 bg-deepbg-900/95 shadow-2xl">
       <!-- Game Hud Overlay -->
       <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
-        <div class="bg-violet-900/80 backdrop-blur-md border border-violet-700/60 rounded-2xl px-4 py-2 flex items-center space-x-4 shadow-lg">
-          <div><span class="text-xs text-violet-300 block">TIME</span><span id="arcade-timer" class="text-lg font-black text-white">60s</span></div>
-          <div class="w-px h-6 bg-violet-700/60"></div>
-          <div><span class="text-xs text-violet-300 block">SCORE</span><span id="arcade-score" class="text-lg font-black text-purple-300">0</span></div>
-          <div class="w-px h-6 bg-violet-700/60"></div>
-          <div><span class="text-xs text-violet-300 block">STREAK</span><span id="arcade-streak" class="text-lg font-black text-amber-300">0x</span></div>
+        <div class="bg-deepbg-950/90 border border-deepbg-700/60 rounded-2xl px-4 py-2 flex items-center space-x-4 shadow-lg">
+          <div><span class="text-xs text-indigo-300 block">TIME</span><span id="arcade-timer" class="text-lg font-black text-white">60s</span></div>
+          <div class="w-px h-6 bg-deepbg-700/60"></div>
+          <div><span class="text-xs text-indigo-300 block">SCORE</span><span id="arcade-score" class="text-lg font-black text-brand-400">0</span></div>
+          <div class="w-px h-6 bg-deepbg-700/60"></div>
+          <div><span class="text-xs text-indigo-300 block">STREAK</span><span id="arcade-streak" class="text-lg font-black text-amber-300">0x</span></div>
         </div>
 
         <button onclick="quitChallenge()" class="pointer-events-auto bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold px-4 py-2 rounded-2xl transition cursor-pointer">
@@ -217,30 +296,30 @@
       <canvas id="arcade-canvas" class="w-full flex-1 block"></canvas>
 
       <!-- Bottom Interactive Blaster Bar -->
-      <div class="p-4 bg-violet-950/90 border-t border-violet-800/60 flex items-center justify-center space-x-3 z-20">
-        <span class="text-sm font-extrabold text-purple-300">TARGET ANSWER:</span>
+      <div class="p-4 bg-deepbg-950/90 border-t border-deepbg-700/60 flex items-center justify-center space-x-3 z-20">
+        <span class="text-sm font-extrabold text-brand-400">TARGET ANSWER:</span>
         <input type="number" id="arcade-answer-input" placeholder="Type answer..." autocomplete="off"
-          class="w-44 text-center text-2xl font-black bg-violet-900/80 border-2 border-purple-400 rounded-xl py-1.5 text-white focus:outline-none">
+          class="w-44 text-center text-2xl font-black bg-deepbg-800/80 border-2 border-brand-400 rounded-xl py-1.5 text-white focus:outline-none">
       </div>
     </section>
 
     <!-- 4. RESULTS & REVIEW SCREEN -->
     <section id="screen-results" class="hidden w-full max-w-xl mx-auto flex flex-col justify-center h-full max-h-[92vh]">
-      <div class="bg-violet-950/80 backdrop-blur-2xl rounded-[2.5rem] p-5 sm:p-6 border border-violet-800/60 shadow-2xl space-y-4 flex flex-col justify-between overflow-hidden">
+      <div class="bg-deepbg-900/95 rounded-[2.5rem] p-5 sm:p-6 border border-deepbg-700/60 shadow-2xl space-y-4 flex flex-col justify-between overflow-hidden">
         
         <div class="text-center">
           <h2 class="text-2xl font-black text-white">Challenge Complete!</h2>
-          <p id="res-subtitle" class="text-xs text-violet-300/80 mt-0.5">Here is how you performed</p>
+          <p id="res-subtitle" class="text-xs text-indigo-300/80 mt-0.5">Here is how you performed</p>
         </div>
 
         <!-- Metrics Row -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="bg-violet-900/40 border border-violet-800/60 p-3 rounded-2xl text-center">
-            <span class="text-xs text-violet-300 font-bold block">Score</span>
-            <span id="res-score" class="text-2xl font-black text-purple-300">0</span>
+          <div class="bg-deepbg-800/40 border border-deepbg-700/60 p-3 rounded-2xl text-center">
+            <span class="text-xs text-indigo-300 font-bold block">Score</span>
+            <span id="res-score" class="text-2xl font-black text-brand-400">0</span>
           </div>
-          <div class="bg-violet-900/40 border border-violet-800/60 p-3 rounded-2xl text-center">
-            <span class="text-xs text-violet-300 font-bold block">Accuracy</span>
+          <div class="bg-deepbg-800/40 border border-deepbg-700/60 p-3 rounded-2xl text-center">
+            <span class="text-xs text-indigo-300 font-bold block">Accuracy</span>
             <span id="res-accuracy" class="text-2xl font-black text-emerald-400">0%</span>
           </div>
         </div>
@@ -248,8 +327,8 @@
         <!-- Wrong Answer Interactive Review Section -->
         <div class="flex-1 flex flex-col space-y-2 min-h-0">
           <div class="flex justify-between items-center">
-            <h3 class="text-xs font-black uppercase text-violet-300/80 tracking-wider">Review Missed Facts</h3>
-            <span id="res-missed-count" class="text-xs font-bold text-violet-400">0 Items</span>
+            <h3 class="text-xs font-black uppercase text-indigo-300/80 tracking-wider">Review Missed Facts</h3>
+            <span id="res-missed-count" class="text-xs font-bold text-indigo-400">0 Items</span>
           </div>
 
           <div id="res-review-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 max-h-[180px] pr-1">
@@ -259,10 +338,10 @@
 
         <!-- Actions -->
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="showScreen('setup')" class="py-3.5 bg-violet-900/60 hover:bg-violet-800/60 text-violet-200 font-black text-sm rounded-2xl border border-violet-700/50 transition cursor-pointer">
+          <button onclick="showScreen('setup')" class="py-3.5 bg-deepbg-800/60 hover:bg-deepbg-700/60 text-indigo-200 font-black text-sm rounded-2xl border border-deepbg-700/60 transition cursor-pointer">
             PLAY AGAIN
           </button>
-          <button id="res-arcade-btn" onclick="launchArcadeFromResults()" class="py-3.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg transition cursor-pointer flex items-center justify-center space-x-1">
+          <button id="res-arcade-btn" onclick="launchArcadeFromResults()" class="py-3.5 bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-black text-sm rounded-2xl shadow-lg transition cursor-pointer flex items-center justify-center space-x-1">
             <span>🚀 Space Blaster</span>
           </button>
         </div>
@@ -272,24 +351,24 @@
   </main>
 
   <!-- MODAL 1: GROWTH REPORT WINDOW -->
-  <div id="growth-modal" class="fixed inset-0 bg-violet-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+  <div id="growth-modal" class="fixed inset-0 bg-deepbg-950/95 z-50 hidden flex items-center justify-center p-4 transition-all">
+    <div class="bg-deepbg-900 border border-deepbg-700/80 rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-modal-content">
       
       <!-- Modal Header -->
-      <div class="p-5 border-b border-violet-800/60 flex justify-between items-center">
+      <div class="p-5 border-b border-deepbg-700/60 flex justify-between items-center">
         <div>
-          <h2 class="text-xl font-black text-white">Growth Report: <span id="growth-student-name" class="text-purple-300">Aliya</span></h2>
-          <p class="text-xs text-violet-300/80">Track fact mastery and practice weak areas</p>
+          <h2 class="text-xl font-black text-white">Growth Report: <span id="growth-student-name" class="text-brand-400">Aliya</span></h2>
+          <p class="text-xs text-indigo-300/80">Track fact mastery and practice weak areas</p>
         </div>
-        <button onclick="closeGrowthModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+        <button onclick="closeGrowthModal()" class="w-8 h-8 rounded-full bg-deepbg-800/80 hover:bg-deepbg-700 text-indigo-200 font-bold text-sm cursor-pointer">✕</button>
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="px-5 pt-3 bg-violet-950/60 border-b border-violet-800/60 flex space-x-2">
-        <button onclick="switchGrowthTab('mult')" id="tab-growth-mult" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-purple-400 text-purple-300 bg-violet-900/60 cursor-pointer">
+      <div class="px-5 pt-3 bg-deepbg-950/60 border-b border-deepbg-700/60 flex space-x-2">
+        <button onclick="switchGrowthTab('mult')" id="tab-growth-mult" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-brand-400 text-brand-400 bg-deepbg-800/60 cursor-pointer">
           Multiplication (×)
         </button>
-        <button onclick="switchGrowthTab('div')" id="tab-growth-div" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-violet-300/80 hover:text-white cursor-pointer">
+        <button onclick="switchGrowthTab('div')" id="tab-growth-div" class="growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-indigo-300/80 hover:text-white cursor-pointer">
           Division (÷)
         </button>
       </div>
@@ -299,28 +378,28 @@
         
         <!-- Key Metrics Cards -->
         <div class="grid grid-cols-3 gap-3">
-          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
-            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Overall Accuracy</span>
+          <div class="bg-deepbg-800/40 p-3 rounded-2xl border border-deepbg-700/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-indigo-300 block">Overall Accuracy</span>
             <span id="growth-metric-acc" class="text-xl font-black text-emerald-400">0%</span>
           </div>
-          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
-            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Mastered (≥85%)</span>
-            <span id="growth-metric-mastered" class="text-xl font-black text-purple-300">0</span>
+          <div class="bg-deepbg-800/40 p-3 rounded-2xl border border-deepbg-700/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-indigo-300 block">Mastered (≥85%)</span>
+            <span id="growth-metric-mastered" class="text-xl font-black text-brand-400">0</span>
           </div>
-          <div class="bg-violet-900/40 p-3 rounded-2xl border border-violet-800/60 text-center">
-            <span class="text-[10px] uppercase font-extrabold text-violet-300 block">Needs Practice</span>
+          <div class="bg-deepbg-800/40 p-3 rounded-2xl border border-deepbg-700/60 text-center">
+            <span class="text-[10px] uppercase font-extrabold text-indigo-300 block">Needs Practice</span>
             <span id="growth-metric-weak" class="text-xl font-black text-rose-400">0</span>
           </div>
         </div>
 
         <!-- Chart -->
-        <div class="bg-violet-900/40 border border-violet-800/60 rounded-2xl p-4 h-48">
+        <div class="bg-deepbg-800/40 border border-deepbg-700/60 rounded-2xl p-4 h-48">
           <canvas id="growthChart"></canvas>
         </div>
 
         <!-- Detailed Fact Grid -->
         <div class="space-y-2">
-          <h3 class="text-xs font-black uppercase tracking-wider text-violet-300">Fact Family Mastery Breakdown</h3>
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-300">Fact Family Mastery Breakdown</h3>
           <div id="growth-fact-cards" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <!-- Rendered by JS -->
           </div>
@@ -331,19 +410,19 @@
   </div>
 
   <!-- MODAL 2: STUDENT SELECTION WINDOW -->
-  <div id="student-modal" class="fixed inset-0 bg-violet-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-md p-5 space-y-4 shadow-2xl flex flex-col max-h-[85vh]">
-      <div class="flex justify-between items-center border-b border-violet-800/60 pb-3">
+  <div id="student-modal" class="fixed inset-0 bg-deepbg-950/95 z-50 hidden flex items-center justify-center p-4 transition-all">
+    <div class="bg-deepbg-900 border border-deepbg-700/80 rounded-[2.5rem] w-full max-w-md p-5 space-y-4 shadow-2xl flex flex-col max-h-[85vh] animate-modal-content">
+      <div class="flex justify-between items-center border-b border-deepbg-700/60 pb-3">
         <div>
           <h2 class="text-lg font-black text-white">Select Student Profile</h2>
-          <p class="text-xs text-violet-300/80">Choose a profile to load saved progress</p>
+          <p class="text-xs text-indigo-300/80">Choose a profile to load saved progress</p>
         </div>
-        <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+        <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full bg-deepbg-800/80 hover:bg-deepbg-700 text-indigo-200 font-bold text-sm cursor-pointer">✕</button>
       </div>
 
       <!-- Search Input -->
       <input type="text" id="student-search-input" oninput="renderStudentSelector()" placeholder="🔍 Search student name..."
-        class="w-full bg-violet-900/40 border border-violet-800/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+        class="w-full bg-deepbg-800/40 border border-deepbg-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-400">
 
       <!-- Grid of Student Profiles -->
       <div id="student-picker-grid" class="grid grid-cols-2 gap-2 overflow-y-auto custom-scrollbar flex-1 pr-1 max-h-60">
@@ -353,19 +432,19 @@
   </div>
 
   <!-- MODAL 3: INVISIBLE TEACHER / ADMIN PORTAL (CTRL + SHIFT + 8) -->
-  <div id="teacher-modal" class="fixed inset-0 bg-violet-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-lg p-6 space-y-5 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-violet-800/60 pb-4">
+  <div id="teacher-modal" class="fixed inset-0 bg-deepbg-950/95 z-50 hidden flex items-center justify-center p-4 transition-all">
+    <div class="bg-deepbg-900 border border-deepbg-700/80 rounded-[2.5rem] w-full max-w-lg p-6 space-y-5 shadow-2xl animate-modal-content">
+      <div class="flex justify-between items-center border-b border-deepbg-700/60 pb-4">
         <div>
           <h2 class="text-xl font-black text-white">Teacher Admin Portal</h2>
-          <p class="text-xs text-violet-300/80">Manage student profiles & data (Shortcut: Ctrl + Shift + 8)</p>
+          <p class="text-xs text-indigo-300/80">Manage student profiles & data (Shortcut: Ctrl + Shift + 8)</p>
         </div>
-        <button onclick="closeTeacherModal()" class="w-8 h-8 rounded-full bg-violet-900/80 hover:bg-violet-800 text-violet-200 font-bold text-sm cursor-pointer">✕</button>
+        <button onclick="closeTeacherModal()" class="w-8 h-8 rounded-full bg-deepbg-800/80 hover:bg-deepbg-700 text-indigo-200 font-bold text-sm cursor-pointer">✕</button>
       </div>
 
       <!-- Student List -->
       <div class="space-y-2">
-        <h3 class="text-xs font-black uppercase text-violet-300">Existing Student Roster</h3>
+        <h3 class="text-xs font-black uppercase text-indigo-300">Existing Student Roster</h3>
         <div id="teacher-student-list" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
           <!-- Rendered dynamically -->
         </div>
@@ -374,35 +453,35 @@
   </div>
 
   <!-- MODAL 4: SPACE BLASTER LOCKED ALERT MODAL -->
-  <div id="lock-modal" class="fixed inset-0 bg-violet-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-violet-950 border border-violet-800/80 rounded-[2.5rem] w-full max-w-md p-6 space-y-5 shadow-2xl text-center">
-      <div class="w-16 h-16 rounded-3xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-3xl mx-auto text-purple-300 shadow-inner">
+  <div id="lock-modal" class="fixed inset-0 bg-deepbg-950/95 z-50 hidden flex items-center justify-center p-4 transition-all">
+    <div class="bg-deepbg-900 border border-deepbg-700/80 rounded-[2.5rem] w-full max-w-md p-6 space-y-5 shadow-2xl text-center animate-modal-content">
+      <div class="w-16 h-16 rounded-3xl bg-brand-500/20 border border-brand-400/40 flex items-center justify-center text-3xl mx-auto text-brand-400 shadow-inner">
         🔒
       </div>
 
       <div class="space-y-1">
         <h3 class="text-xl font-black text-white">Space Blaster Locked!</h3>
-        <p class="text-xs text-violet-300/80">Complete classic challenges with facts greater than 2 to unlock</p>
+        <p class="text-xs text-indigo-300/80">Complete classic challenges with facts greater than 2 to unlock</p>
       </div>
 
-      <div class="bg-violet-900/40 p-4 rounded-2xl border border-violet-800/80 space-y-3 text-left">
+      <div class="bg-deepbg-800/40 p-4 rounded-2xl border border-deepbg-700/80 space-y-3 text-left">
         <div class="flex justify-between items-center">
-          <span class="text-xs font-extrabold text-violet-200">Unlock Progress:</span>
-          <span id="lock-modal-progress-count" class="text-xs font-black text-purple-300">0/5 Unique Challenges</span>
+          <span class="text-xs font-extrabold text-indigo-200">Unlock Progress:</span>
+          <span id="lock-modal-progress-count" class="text-xs font-black text-brand-400">0/5 Unique Challenges</span>
         </div>
         
-        <div class="w-full bg-violet-950 h-2.5 rounded-full overflow-hidden">
-          <div id="lock-modal-progress-bar" class="h-full bg-gradient-to-r from-violet-500 to-purple-400 transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full bg-deepbg-950 h-2.5 rounded-full overflow-hidden">
+          <div id="lock-modal-progress-bar" class="h-full bg-gradient-to-r from-brand-600 to-accent-400 transition-all duration-300" style="width: 0%"></div>
         </div>
 
-        <div class="space-y-1 text-[11px] text-violet-300/80 pt-1 border-t border-violet-800/60">
+        <div class="space-y-1 text-[11px] text-indigo-300/80 pt-1 border-t border-deepbg-700/60">
           <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Score <strong>> 80% accuracy</strong> in Classic Mode</span></p>
           <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Use target facts strictly <strong>greater than 2</strong> (3s - 12s)</span></p>
           <p class="flex items-center space-x-1.5"><span class="text-emerald-400">✓</span><span>Complete <strong>5 different math fact setups</strong></span></p>
         </div>
       </div>
 
-      <button onclick="closeLockModal()" class="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl transition cursor-pointer">
+      <button onclick="closeLockModal()" class="w-full py-3 bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-black text-sm rounded-2xl transition cursor-pointer">
         GOT IT!
       </button>
     </div>
@@ -439,7 +518,8 @@
         currentQuestion: null,
         questionPool: [],
         missedQuestions: [],
-        totalAttempted: 0
+        totalAttempted: 0,
+        isProcessing: false
       },
       arcade: {
         canvas: null,
@@ -522,6 +602,19 @@
       });
     });
 
+    /* Modal Helper Utilities with Animation Backdrop support */
+    function toggleModalVisible(modalId, visible) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      if (visible) {
+        modal.classList.remove('hidden');
+        modal.classList.add('animate-modal-backdrop');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('animate-modal-backdrop');
+      }
+    }
+
     /* Google Sheets 2-Way Sync Engine */
     function loadProfilesFromSheet() {
       if (!GOOGLE_SHEETS_URL) return;
@@ -596,18 +689,18 @@
       return {
         multStats: Array(13).fill(0).map(() => ({ total: 0, correct: 0 })),
         divStats: Array(13).fill(0).map(() => ({ total: 0, correct: 0 })),
-        qualifyingRuns: [] // Array of unique qualifying fact string configurations
+        qualifyingRuns: []
       };
     }
 
     /* Student Selector Modal Logic */
     function openStudentModal() {
       renderStudentSelector();
-      document.getElementById('student-modal').classList.remove('hidden');
+      toggleModalVisible('student-modal', true);
     }
 
     function closeStudentModal() {
-      document.getElementById('student-modal').classList.add('hidden');
+      toggleModalVisible('student-modal', false);
     }
 
     function selectStudent(name) {
@@ -625,7 +718,7 @@
       if (!grid) return;
 
       const searchTerm = (document.getElementById('student-search-input')?.value || '').toLowerCase().trim();
-      grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
 
       Object.keys(STATE.students)
         .filter(name => name.toLowerCase().includes(searchTerm))
@@ -637,35 +730,40 @@
           card.onclick = () => selectStudent(name);
           card.className = `p-2.5 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
             isActive
-              ? 'bg-purple-600/40 border-purple-400 text-white shadow-md shadow-purple-600/20'
-              : 'bg-violet-900/40 border-violet-800/80 text-violet-200 hover:border-violet-700 hover:bg-violet-800/50'
+              ? 'bg-brand-600/40 border-brand-400 text-white shadow-md shadow-brand-600/20'
+              : 'bg-deepbg-800/40 border-deepbg-700/80 text-indigo-200 hover:border-deepbg-700 hover:bg-deepbg-700/50'
           }`;
 
           card.innerHTML = `
             <div class="flex items-center space-x-2 truncate">
               <span class="text-xs">${isActive ? '⭐' : '👤'}</span>
-              <span class="font-bold text-xs truncate ${isActive ? 'text-purple-200' : 'text-violet-200'}">${name}</span>
+              <span class="font-bold text-xs truncate ${isActive ? 'text-brand-400' : 'text-indigo-200'}">${name}</span>
             </div>
           `;
-          grid.appendChild(card);
+          fragment.appendChild(card);
         });
+
+      grid.innerHTML = '';
+      grid.appendChild(fragment);
     }
 
     function renderFactGrid() {
       const grid = document.getElementById('facts-grid');
-      grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
       for (let i = 0; i <= 12; i++) {
         const btn = document.createElement('button');
         const isSelected = STATE.selectedFacts.includes(i);
         btn.className = `fact-btn py-2 rounded-xl text-xs font-black border transition cursor-pointer ${
           isSelected 
-            ? 'bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-md shadow-purple-600/20' 
-            : 'bg-violet-900/40 border-violet-800/80 text-violet-300 hover:text-white'
+            ? 'bg-gradient-to-r from-brand-600 to-accent-500 border-brand-400 text-white shadow-md shadow-brand-600/20' 
+            : 'bg-deepbg-800/40 border-deepbg-700/80 text-indigo-300 hover:text-white'
         }`;
         btn.textContent = `${i}s`;
         btn.onclick = () => toggleFact(i);
-        grid.appendChild(btn);
+        fragment.appendChild(btn);
       }
+      grid.innerHTML = '';
+      grid.appendChild(fragment);
     }
 
     function toggleFact(num) {
@@ -691,10 +789,10 @@
     function selectOperation(op) {
       STATE.selectedOp = op;
       document.querySelectorAll('.op-btn').forEach(btn => {
-        btn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-violet-900/40 border-violet-700/50 text-violet-300 cursor-pointer';
+        btn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 cursor-pointer';
       });
       const activeBtn = document.getElementById(`op-${op}`);
-      activeBtn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-violet-600 to-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30 cursor-pointer';
+      activeBtn.className = 'op-btn py-2 px-3 rounded-2xl border font-black text-sm transition bg-gradient-to-r from-brand-600 to-accent-500 border-brand-400 text-white shadow-lg shadow-brand-600/30 cursor-pointer';
     }
 
     /* Lock Requirements Verification Logic */
@@ -731,21 +829,21 @@
       const cBtn = document.getElementById('mode-classic-btn');
       const aBtn = document.getElementById('mode-arcade-btn');
       if (mode === 'classic') {
-        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white cursor-pointer';
-        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer';
+        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-brand-600/40 border-brand-400 text-white cursor-pointer';
+        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 hover:text-white cursor-pointer';
       } else {
-        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-purple-600/40 border-purple-400 text-white cursor-pointer';
-        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-violet-900/40 border-violet-700/50 text-violet-300 hover:text-white cursor-pointer';
+        aBtn.className = 'relative py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-brand-600/40 border-brand-400 text-white cursor-pointer';
+        cBtn.className = 'py-2.5 px-3 rounded-2xl border font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 bg-deepbg-800/50 border-deepbg-700/80 text-indigo-300 hover:text-white cursor-pointer';
       }
     }
 
     function openLockModal() {
       updateLockStatusUI();
-      document.getElementById('lock-modal').classList.remove('hidden');
+      toggleModalVisible('lock-modal', true);
     }
 
     function closeLockModal() {
-      document.getElementById('lock-modal').classList.add('hidden');
+      toggleModalVisible('lock-modal', false);
     }
 
     function generateQuestionPool() {
@@ -768,8 +866,14 @@
     }
 
     function showScreen(screenId) {
-      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-      document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+      document.querySelectorAll('main > section').forEach(sec => {
+        sec.classList.add('hidden');
+        sec.classList.remove('animate-screen-in');
+      });
+      const target = document.getElementById(`screen-${screenId}`);
+      target.classList.remove('hidden');
+      void target.offsetWidth; // Force CSS reflow to restart entry transition smoothly
+      target.classList.add('animate-screen-in');
     }
 
     /* START CHALLENGE */
@@ -786,6 +890,7 @@
       STATE.quiz.missedQuestions = [];
       STATE.quiz.totalAttempted = 0;
       STATE.quiz.timer = 60;
+      STATE.quiz.isProcessing = false;
 
       if (STATE.gameMode === 'classic') {
         showScreen('quiz');
@@ -809,10 +914,12 @@
       if (STATE.quiz.questionPool.length === 0) {
         STATE.quiz.questionPool = generateQuestionPool();
       }
+      STATE.quiz.isProcessing = false;
       STATE.quiz.currentQuestion = STATE.quiz.questionPool.pop();
       document.getElementById('quiz-question-text').textContent = `${STATE.quiz.currentQuestion.text} = ?`;
       
       const input = document.getElementById('quiz-answer-input');
+      input.disabled = false;
       input.value = '';
       input.focus();
 
@@ -836,7 +943,7 @@
       const input = document.getElementById('quiz-answer-input');
       
       input.addEventListener('input', () => {
-        if (!STATE.quiz.currentQuestion || !input.value) return;
+        if (STATE.quiz.isProcessing || !STATE.quiz.currentQuestion || !input.value) return;
         const userVal = parseInt(input.value);
         const expectedLen = STATE.quiz.currentQuestion.answer.toString().length;
 
@@ -849,12 +956,25 @@
         }
       });
       
-      input.addEventListener('wheel', (e) => e.preventDefault());
+      // Prevent scroll wheel modifying active numeric input across the application
+      document.addEventListener('wheel', (e) => {
+        if (document.activeElement && document.activeElement.type === 'number') {
+          e.preventDefault();
+          document.activeElement.blur();
+        }
+      }, { passive: false });
     }
 
     function handleAnswer(isCorrect, isTimeout = false) {
+      if (STATE.quiz.isProcessing) return;
+      STATE.quiz.isProcessing = true;
+
       clearTimeout(STATE.quiz.questionTimerBar);
       STATE.quiz.totalAttempted++;
+      
+      const input = document.getElementById('quiz-answer-input');
+      if (input) input.disabled = true;
+
       const q = STATE.quiz.currentQuestion;
       const student = STATE.students[STATE.activeStudent];
 
@@ -875,7 +995,7 @@
         STATE.quiz.streak = 0;
         STATE.quiz.missedQuestions.push({
           question: q.text,
-          userAnswer: isTimeout ? 'Timed Out' : document.getElementById('quiz-answer-input').value,
+          userAnswer: isTimeout ? 'Timed Out' : input.value,
           correctAnswer: q.answer
         });
         banner.className = 'h-6 text-sm font-extrabold text-rose-400';
@@ -1004,9 +1124,9 @@
 
         ctx.beginPath();
         ctx.arc(m.x, m.y, 28, 0, Math.PI * 2);
-        ctx.fillStyle = '#4c1d95';
+        ctx.fillStyle = '#1d1057';
         ctx.fill();
-        ctx.strokeStyle = '#a855f7';
+        ctx.strokeStyle = '#818cf8';
         ctx.lineWidth = 3;
         ctx.stroke();
 
@@ -1048,7 +1168,7 @@
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, canvas.height);
         ctx.lineTo(l.tx, l.ty);
-        ctx.strokeStyle = `rgba(168, 85, 247, ${l.life})`;
+        ctx.strokeStyle = `rgba(129, 140, 248, ${l.life})`;
         ctx.lineWidth = 4;
         ctx.stroke();
         if (l.life <= 0) STATE.arcade.lasers.splice(i, 1);
@@ -1065,7 +1185,7 @@
           vy: (Math.random() - 0.5) * 8,
           size: Math.random() * 4 + 2,
           life: 1.0,
-          color: '168, 85, 247'
+          color: '129, 140, 248'
         });
       }
     }
@@ -1123,10 +1243,10 @@
 
       const resArcadeBtn = document.getElementById('res-arcade-btn');
       if (isArcadeUnlocked()) {
-        resArcadeBtn.className = 'py-3.5 px-5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer';
+        resArcadeBtn.className = 'py-3.5 px-5 bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-white font-black text-sm rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer';
         resArcadeBtn.innerHTML = `<span>🚀 Play Space Blaster</span>`;
       } else {
-        resArcadeBtn.className = 'py-3.5 px-5 bg-violet-900/40 border border-violet-800/80 text-violet-400 font-black text-sm rounded-2xl transition flex items-center justify-center space-x-2 cursor-pointer';
+        resArcadeBtn.className = 'py-3.5 px-5 bg-deepbg-800/40 border border-deepbg-700/80 text-indigo-400 font-black text-sm rounded-2xl transition flex items-center justify-center space-x-2 cursor-pointer';
         resArcadeBtn.innerHTML = `<span>🔒 Space Blaster</span>`;
       }
 
@@ -1140,9 +1260,10 @@
           </div>
         `;
       } else {
+        const fragment = document.createDocumentFragment();
         STATE.quiz.missedQuestions.forEach((item, idx) => {
           const div = document.createElement('div');
-          div.className = 'bg-violet-900/40 border border-violet-800/80 p-2.5 rounded-2xl flex items-center justify-between text-xs';
+          div.className = 'bg-deepbg-800/40 border border-deepbg-700/80 p-2.5 rounded-2xl flex items-center justify-between text-xs';
           div.id = `review-item-${idx}`;
           div.innerHTML = `
             <div class="space-y-0.5">
@@ -1152,18 +1273,17 @@
             <div class="flex items-center space-x-1.5">
               <input type="number" id="retry-input-${idx}" placeholder="?" 
                 oninput="autoCheckRetry(${idx}, ${item.correctAnswer})"
-                class="w-14 bg-violet-950 border border-violet-700/80 text-center font-bold text-white py-1 rounded-xl focus:border-purple-400 focus:outline-none text-xs">
+                onwheel="this.blur(); event.preventDefault();"
+                class="w-14 bg-deepbg-950 border border-deepbg-700/80 text-center font-bold text-white py-1 rounded-xl focus:border-brand-400 focus:outline-none text-xs">
               <button onclick="revealAnswer(${idx}, ${item.correctAnswer})" 
-                class="bg-violet-800 hover:bg-violet-700 text-purple-200 font-bold px-2 py-1 rounded-xl text-xs cursor-pointer" title="Auto-fill Answer">
+                class="bg-deepbg-700 hover:bg-deepbg-600 text-indigo-200 font-bold px-2 py-1 rounded-xl text-xs cursor-pointer" title="Auto-fill Answer">
                 💡
-              </button>
-              <button onclick="retryQuestion(${idx}, ${item.correctAnswer})" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1 rounded-xl text-xs cursor-pointer">
-                Check
               </button>
             </div>
           `;
-          reviewContainer.appendChild(div);
+          fragment.appendChild(div);
         });
+        reviewContainer.appendChild(fragment);
       }
     }
 
@@ -1181,13 +1301,10 @@
       const input = document.getElementById(`retry-input-${idx}`);
       if (!input || input.value === '') return;
       
-      const userVal = parseInt(input.value);
       const targetLen = correctAnswer.toString().length;
 
       if (input.value.length >= targetLen) {
-        if (userVal === correctAnswer) {
-          retryQuestion(idx, correctAnswer);
-        }
+        retryQuestion(idx, correctAnswer);
       }
     }
 
@@ -1221,22 +1338,22 @@
     }
 
     function openGrowthModal() {
-      document.getElementById('growth-modal').classList.remove('hidden');
+      toggleModalVisible('growth-modal', true);
       document.getElementById('growth-student-name').textContent = STATE.activeStudent;
       renderGrowthReport();
     }
 
     function closeGrowthModal() {
-      document.getElementById('growth-modal').classList.add('hidden');
+      toggleModalVisible('growth-modal', false);
     }
 
     function switchGrowthTab(type) {
       STATE.growthTab = type;
       document.querySelectorAll('.growth-tab').forEach(t => {
-        t.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-violet-300/80 hover:text-white cursor-pointer';
+        t.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-transparent text-indigo-300/80 hover:text-white cursor-pointer';
       });
       const active = document.getElementById(`tab-growth-${type}`);
-      active.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-purple-400 text-purple-300 bg-violet-900/60 cursor-pointer';
+      active.className = 'growth-tab py-2 px-4 rounded-t-xl text-xs font-extrabold border-b-2 border-brand-400 text-brand-400 bg-deepbg-800/60 cursor-pointer';
       renderGrowthReport();
     }
 
@@ -1269,52 +1386,62 @@
       document.getElementById('growth-metric-mastered').textContent = masteredCount;
       document.getElementById('growth-metric-weak').textContent = weakCount;
 
-      const ctx = document.getElementById('growthChart').getContext('2d');
-      if (STATE.growthChartInstance) STATE.growthChartInstance.destroy();
+      const barColors = accuracyData.map(val => val >= 85 ? '#818cf8' : val >= 75 ? '#f59e0b' : '#f43f5e');
 
-      STATE.growthChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Accuracy %',
-            data: accuracyData,
-            backgroundColor: accuracyData.map(val => val >= 85 ? '#a855f7' : val >= 75 ? '#f59e0b' : '#f43f5e'),
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { max: 100, beginAtZero: true, grid: { color: '#3b0764' }, ticks: { color: '#c084fc' } },
-            x: { grid: { display: false }, ticks: { color: '#c084fc' } }
+      if (STATE.growthChartInstance) {
+        STATE.growthChartInstance.data.labels = labels;
+        STATE.growthChartInstance.data.datasets[0].data = accuracyData;
+        STATE.growthChartInstance.data.datasets[0].backgroundColor = barColors;
+        STATE.growthChartInstance.update('none');
+      } else {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        STATE.growthChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Accuracy %',
+              data: accuracyData,
+              backgroundColor: barColors,
+              borderRadius: 8
+            }]
           },
-          plugins: { legend: { display: false } }
-        }
-      });
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { max: 100, beginAtZero: true, grid: { color: '#281775' }, ticks: { color: '#a5b4fc' } },
+              x: { grid: { display: false }, ticks: { color: '#a5b4fc' } }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
 
       const grid = document.getElementById('growth-fact-cards');
-      grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
 
       statsArray.forEach((stat, i) => {
         const acc = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0;
         const card = document.createElement('div');
-        card.className = 'bg-violet-900/40 border border-violet-800/80 p-3 rounded-2xl flex flex-col justify-between space-y-2';
+        card.className = 'bg-deepbg-800/40 border border-deepbg-700/80 p-3 rounded-2xl flex flex-col justify-between space-y-2';
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="font-black text-white text-xs">${i}s Family</span>
-            <span class="text-xs font-bold ${acc >= 85 ? 'text-purple-300' : acc >= 75 ? 'text-amber-400' : 'text-rose-400'}">${acc}%</span>
+            <span class="text-xs font-bold ${acc >= 85 ? 'text-brand-400' : acc >= 75 ? 'text-amber-400' : 'text-rose-400'}">${acc}%</span>
           </div>
-          <div class="w-full bg-violet-950 h-1.5 rounded-full overflow-hidden">
-            <div class="h-full ${acc >= 85 ? 'bg-purple-500' : acc >= 75 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${acc}%"></div>
+          <div class="w-full bg-deepbg-950 h-1.5 rounded-full overflow-hidden">
+            <div class="h-full ${acc >= 85 ? 'bg-brand-500' : acc >= 75 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${acc}%"></div>
           </div>
-          <button onclick="practiceTargetedFact(${i})" class="w-full py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 rounded-xl text-[11px] font-bold transition cursor-pointer">
+          <button onclick="practiceTargetedFact(${i})" class="w-full py-1 bg-brand-600/30 hover:bg-brand-600/50 text-indigo-200 border border-brand-500/40 rounded-xl text-[11px] font-bold transition cursor-pointer">
             Practice ${i}s
           </button>
         `;
-        grid.appendChild(card);
+        fragment.appendChild(card);
       });
+
+      grid.innerHTML = '';
+      grid.appendChild(fragment);
     }
 
     function practiceTargetedFact(factNum) {
@@ -1334,30 +1461,33 @@
     }
 
     function openTeacherModal() {
-      document.getElementById('teacher-modal').classList.remove('hidden');
+      toggleModalVisible('teacher-modal', true);
       renderTeacherStudentList();
     }
 
     function closeTeacherModal() {
-      document.getElementById('teacher-modal').classList.add('hidden');
+      toggleModalVisible('teacher-modal', false);
     }
 
     function renderTeacherStudentList() {
       const container = document.getElementById('teacher-student-list');
-      container.innerHTML = '';
+      const fragment = document.createDocumentFragment();
 
       Object.keys(STATE.students).forEach(name => {
         const item = document.createElement('div');
-        item.className = 'bg-violet-900/40 border border-violet-800/80 p-3 rounded-2xl flex items-center justify-between text-xs';
+        item.className = 'bg-deepbg-800/40 border border-deepbg-700/80 p-3 rounded-2xl flex items-center justify-between text-xs';
         item.innerHTML = `
           <span class="font-bold text-white">${name}</span>
           <div class="flex items-center space-x-2">
-            <button onclick="renameStudent('${name}')" class="text-purple-300 hover:underline font-semibold cursor-pointer">Rename</button>
+            <button onclick="renameStudent('${name}')" class="text-brand-400 hover:underline font-semibold cursor-pointer">Rename</button>
             <button onclick="deleteStudent('${name}')" class="text-rose-400 hover:underline font-semibold cursor-pointer">Delete</button>
           </div>
         `;
-        container.appendChild(item);
+        fragment.appendChild(item);
       });
+
+      container.innerHTML = '';
+      container.appendChild(fragment);
     }
 
     function renameStudent(oldName) {
