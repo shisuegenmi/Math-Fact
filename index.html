@@ -1267,15 +1267,15 @@
           div.id = `review-item-${idx}`;
           div.innerHTML = `
             <div class="space-y-0.5">
-              <span class="font-black text-white text-xs block">${item.question}</span>
+              <span class="font-black text-white text-xs block" id="review-question-${idx}">${item.question}</span>
               <span class="text-rose-400 font-bold text-[11px]">Your answer: ${item.userAnswer}</span>
             </div>
             <div class="flex items-center space-x-1.5">
               <input type="number" id="retry-input-${idx}" placeholder="?" 
-                oninput="autoCheckRetry(${idx}, ${item.correctAnswer})"
+                oninput="autoCheckRetry(${idx}, ${item.correctAnswer}, '${item.question.replace(/'/g, "\\'")}')"
                 onwheel="this.blur(); event.preventDefault();"
                 class="w-14 bg-deepbg-950 border border-deepbg-700/80 text-center font-bold text-white py-1 rounded-xl focus:border-brand-400 focus:outline-none text-xs">
-              <button onclick="revealAnswer(${idx}, ${item.correctAnswer})" 
+              <button onclick="revealAnswer(${idx}, ${item.correctAnswer}, '${item.question.replace(/'/g, "\\'")}')" 
                 class="bg-deepbg-700 hover:bg-deepbg-600 text-indigo-200 font-bold px-2 py-1 rounded-xl text-xs cursor-pointer" title="Auto-fill Answer">
                 💡
               </button>
@@ -1297,35 +1297,43 @@
     }
 
     /* Automatically validates answer in real-time as the student types */
-    function autoCheckRetry(idx, correctAnswer) {
+    function autoCheckRetry(idx, correctAnswer, questionText) {
       const input = document.getElementById(`retry-input-${idx}`);
       if (!input || input.value === '') return;
       
       const targetLen = correctAnswer.toString().length;
 
       if (input.value.length >= targetLen) {
-        retryQuestion(idx, correctAnswer);
+        retryQuestion(idx, correctAnswer, questionText);
       }
     }
 
     /* Automatically reveals and submits the correct answer upon clicking the hint icon */
-    function revealAnswer(idx, correctAnswer) {
+    function revealAnswer(idx, correctAnswer, questionText) {
       const input = document.getElementById(`retry-input-${idx}`);
       if (input) {
         input.value = correctAnswer;
-        retryQuestion(idx, correctAnswer);
+        retryQuestion(idx, correctAnswer, questionText);
       }
     }
 
-    function retryQuestion(idx, correctAnswer) {
+    function retryQuestion(idx, correctAnswer, questionText) {
       const input = document.getElementById(`retry-input-${idx}`);
       const val = parseInt(input.value);
       const row = document.getElementById(`review-item-${idx}`);
 
+      if (!questionText) {
+        const qElem = document.getElementById(`review-question-${idx}`);
+        questionText = qElem ? qElem.textContent : '';
+      }
+
       if (val === correctAnswer) {
         row.className = 'bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-2xl flex items-center justify-between text-xs';
         row.innerHTML = `
-          <span class="font-bold text-emerald-400">✓ Corrected! (${correctAnswer})</span>
+          <div class="space-y-0.5">
+            <span class="font-black text-white text-xs block">${questionText} = ${correctAnswer}</span>
+            <span class="text-emerald-400 font-bold text-[11px]">✓ Corrected!</span>
+          </div>
           <span class="text-xs text-emerald-300 font-extrabold">Good Job!</span>
         `;
         AUDIO.correct();
